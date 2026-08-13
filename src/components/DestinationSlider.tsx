@@ -110,36 +110,39 @@ export default function DestinationSlider({ trips: propTrips, locale }: Props) {
         </div>
 
         {/* Right: info + thumbnails */}
-        <div className="lg:w-[42%] bg-cream flex flex-col justify-center px-10 lg:px-14 py-14 h-[420px] lg:h-full overflow-hidden">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={trip.slug + '-txt'}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] }}
-            >
-              
-              <p className="wl-meta mb-4">{date} &nbsp;·&nbsp; {trip.location}</p>
+        <div className="lg:w-[42%] bg-cream flex flex-col px-10 lg:px-14 py-10 lg:py-14 lg:h-full lg:overflow-hidden">
 
-              <h2 className="wl-title text-3xl sm:text-4xl mb-5">
-                {trip.title[locale]}
-              </h2>
-
-              <p className="text-meta text-[15px] leading-relaxed mb-8">
-                {trip.summary[locale]}
-              </p>
-
-              <button
-                onClick={() => openLightbox(0)}
-                className="wl-link text-left"
+          {/* Text content — grows to fill, centers text vertically on desktop */}
+          <div className="flex-1 flex flex-col justify-center">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={trip.slug + '-txt'}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] }}
               >
-                {ALBUM_LABEL[locale]} →
-              </button>
-            </motion.div>
-          </AnimatePresence>
+                <p className="wl-meta mb-4">{date} &nbsp;·&nbsp; {trip.location}</p>
 
-          {/* ── Thumbnail nav ── */}
+                <h2 className="wl-title text-3xl sm:text-4xl mb-5">
+                  {trip.title[locale]}
+                </h2>
+
+                <p className="text-meta text-[15px] leading-relaxed mb-8">
+                  {trip.summary[locale]}
+                </p>
+
+                <button
+                  onClick={() => openLightbox(0)}
+                  className="wl-link text-left"
+                >
+                  {ALBUM_LABEL[locale]} →
+                </button>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* ── Thumbnail nav — pinned to bottom ── */}
           <div className="mt-10 pt-8 border-t border-[#e0ddd3]">
             <div className="flex gap-3 overflow-x-auto pb-1 snap-x scrollbar-none">
               {trips.map((t, i) => (
@@ -159,7 +162,7 @@ export default function DestinationSlider({ trips: propTrips, locale }: Props) {
           </div>
 
           {/* Prev / Next controls */}
-          <div className="flex gap-3 mt-5 justify-end">
+          <div className="flex gap-3 mt-5 mb-2 justify-end">
             <button
               onClick={goPrev}
               className="w-9 h-9 border border-[#d0ccc3] rounded-lg flex items-center justify-center text-meta hover:text-sage hover:border-sage transition-colors"
