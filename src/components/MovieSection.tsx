@@ -104,18 +104,18 @@ export default function MovieSection({ movies: propMovies, locale, sectionLabel,
   return (
     <>
       {/* ── Section header ── */}
-      <div className="flex items-end justify-between mb-12">
-        <div>
-          {sectionLabel && <p className="wl-section-label mb-2">{sectionLabel}</p>}
+      <div className="mb-12">
+        {sectionLabel && <p className="wl-section-label mb-2">{sectionLabel}</p>}
+        <div className="flex items-center justify-between">
           <h2 className="wl-title text-3xl sm:text-4xl">{sectionTitle}</h2>
-          {subtitle && <p className="text-meta text-[15px] leading-relaxed mt-3">{subtitle}</p>}
+          <button
+            onClick={() => setShowAll(true)}
+            className="wl-link hidden sm:inline-block shrink-0 ml-6"
+          >
+            {seeAll} →
+          </button>
         </div>
-        <button
-          onClick={() => setShowAll(true)}
-          className="wl-link hidden sm:inline-block"
-        >
-          {seeAll} →
-        </button>
+        {subtitle && <p className="text-meta text-[15px] leading-relaxed mt-3">{subtitle}</p>}
       </div>
 
       {/* ── 4-column grid ── */}
