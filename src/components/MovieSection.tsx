@@ -106,15 +106,7 @@ export default function MovieSection({ movies: propMovies, locale, sectionLabel,
       {/* ── Section header ── */}
       <div className="mb-12">
         {sectionLabel && <p className="wl-section-label mb-2">{sectionLabel}</p>}
-        <div className="flex items-center justify-between">
-          <h2 className="wl-title text-3xl sm:text-4xl">{sectionTitle}</h2>
-          <button
-            onClick={() => setShowAll(true)}
-            className="wl-link hidden lg:inline-block shrink-0 ml-6"
-          >
-            {seeAll} →
-          </button>
-        </div>
+        <h2 className="wl-title text-3xl sm:text-4xl">{sectionTitle}</h2>
         {subtitle && <p className="text-meta text-[15px] leading-relaxed mt-3">{subtitle}</p>}
       </div>
 
@@ -172,8 +164,8 @@ export default function MovieSection({ movies: propMovies, locale, sectionLabel,
         </div>
       )}
 
-      {/* See all — below grid on non-desktop */}
-      <div className="mt-6 flex justify-center lg:hidden">
+      {/* See all — below grid */}
+      <div className="mt-6 flex justify-center">
         <button onClick={() => setShowAll(true)} className="wl-link">
           {seeAll} →
         </button>
