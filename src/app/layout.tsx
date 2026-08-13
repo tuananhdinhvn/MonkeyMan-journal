@@ -1,39 +1,55 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import type { Metadata } from 'next';
+import { Roboto } from 'next/font/google';
+import { readFile } from 'fs/promises';
+import path from 'path';
+import Script from 'next/script';
+import './globals.css';
+
+const roboto = Roboto({
+  subsets: ['latin', 'latin-ext', 'vietnamese'],
+  weight: ['300', '400', '500', '700'],
+  style: ['normal', 'italic'],
+  variable: '--font-roboto',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
-  title: {
-    default: "Monkey Man",
-    template: "%s | Monkey Man",
-  },
-  description: "Personal portfolio & blog of Monkey Man.",
-  metadataBase: new URL("https://example.com"),
+  title: { default: 'MonkeyMan — Travel Journal', template: '%s | MonkeyMan' },
+  description: 'Nhật ký du lịch cá nhân của Tuấn Anh — khám phá Việt Nam qua từng chuyến đi.',
+  metadataBase: new URL('https://monkeyman.vn'),
+  // icons handled by src/app/icon.png (App Router convention) and [locale]/layout.tsx
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+async function getGaId(): Promise<string> {
+  try {
+    const raw = await readFile(path.join(process.cwd(), 'public', 'site-settings.json'), 'utf-8');
+    return (JSON.parse(raw) as { gaId?: string }).gaId ?? '';
+  } catch {
+    return '';
+  }
+}
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const gaId = await getGaId();
+
   return (
-    <html lang="vi">
-      <body>
-        <div className="mx-auto flex min-h-screen max-w-3xl flex-col px-6">
-          <header className="flex items-center justify-between py-8">
-            <a href="/" className="font-semibold">
-              Monkey Man
-            </a>
-            <nav className="flex gap-6 text-sm">
-              <a href="/">Home</a>
-              <a href="/blog">Blog</a>
-              <a href="/#contact">Contact</a>
-            </nav>
-          </header>
-          <main className="flex-1">{children}</main>
-          <footer className="py-10 text-sm text-neutral-500">
-            © {new Date().getFullYear()} Monkey Man
-          </footer>
-        </div>
+    <html className={roboto.variable} suppressHydrationWarning>
+      <body className="bg-white text-ink font-sans antialiased" suppressHydrationWarning>
+        {children}
+        {gaId && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga-init" strategy="afterInteractive">{`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${gaId}');
+            `}</Script>
+          </>
+        )}
       </body>
     </html>
   );

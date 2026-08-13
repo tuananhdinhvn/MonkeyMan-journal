@@ -1,0 +1,76 @@
+{
+  "nav": {
+    "home": "Trang chủ",
+    "travels": "Du lịch",
+    "experiences": "Trải nghiệm",
+    "movies": "Phim",
+    "contact": "Liên hệ"
+  },
+  "home": {
+    "hero_title": "Khám Phá Việt Nam",
+    "hero_subtitle": "cùng MonkeyMan",
+    "hero_description": "Tôi là Tuấn Anh — hướng dẫn viên du lịch người Việt đam mê chia sẻ những vẻ đẹp ẩn giấu và cảnh quan tuyệt vời của Việt Nam với thế giới.",
+    "hero_cta": "Xem chuyến đi",
+    "hero_contact": "Liên hệ ngay",
+    "about_title": "Về Tôi",
+    "about_description": "Sinh ra và lớn lên tại Việt Nam, tôi đã dành nhiều năm khám phá từng ngóc ngách của đất nước tuyệt vời này. Từ làn nước ngọc bích của Vịnh Hạ Long đến những chiếc đèn lồng vàng ở Hội An, tôi ở đây để giúp bạn trải nghiệm Việt Nam như người địa phương.",
+    "featured_trips": "Chuyến Đi Nổi Bật",
+    "featured_trips_subtitle": "Những chuyến phiêu lưu được chọn lọc khắp Việt Nam",
+    "customer_experiences": "Khách Hàng Nói Gì",
+    "customer_experiences_subtitle": "Những câu chuyện thật từ những du khách thật",
+    "favorite_movies": "Góc Phim",
+    "favorite_movies_subtitle": "Những bộ phim truyền cảm hứng cho hành trình của tôi",
+    "view_all": "Xem tất cả"
+  },
+  "travels": {
+    "title": "Nhật Ký Du Lịch",
+    "subtitle": "Mỗi hành trình kể một câu chuyện",
+    "all_trips": "Tất cả chuyến đi",
+    "read_more": "Đọc thêm",
+    "back": "← Quay lại Du lịch",
+    "location": "Địa điểm",
+    "duration": "Thời gian",
+    "best_time": "Thời điểm lý tưởng",
+    "gallery": "Thư viện ảnh",
+    "share": "Chia sẻ chuyến đi"
+  },
+  "experiences": {
+    "title": "Trải Nghiệm Du Khách",
+    "subtitle": "Những câu chuyện được chia sẻ bởi những người đã khám phá Việt Nam cùng tôi",
+    "from": "Đến từ"
+  },
+  "movies": {
+    "title": "Góc Phim",
+    "subtitle": "Những bộ phim tôi yêu thích và giới thiệu",
+    "genre": "Thể loại",
+    "year": "Năm",
+    "rating": "Đánh giá"
+  },
+  "contact": {
+    "title": "Liên Hệ",
+    "subtitle": "Hãy cùng lên kế hoạch cho chuyến phiêu lưu Việt Nam của bạn",
+    "email_label": "Email",
+    "phone_label": "Điện thoại",
+    "social_label": "Theo dõi tôi",
+    "form_name": "Tên của bạn",
+    "form_email": "Email của bạn",
+    "form_message": "Nội dung tin nhắn",
+    "form_submit": "Gửi tin nhắn",
+    "form_sending": "Đang gửi...",
+    "form_success": "Đã gửi! Tôi sẽ liên hệ lại với bạn sớm.",
+    "form_error": "Có lỗi xảy ra. Vui lòng thử lại."
+  },
+  "footer": {
+    "tagline": "Người dẫn đường khám phá Việt Nam",
+    "rights": "Bảo lưu mọi quyền"
+  },
+  "comments": {
+    "title": "Bình luận",
+    "login_prompt": "Đăng nhập để để lại bình luận",
+    "login_google": "Tiếp tục với Google",
+    "login_facebook": "Tiếp tục với Facebook",
+    "placeholder": "Chia sẻ suy nghĩ của bạn...",
+    "submit": "Đăng bình luận",
+    "count": "{count} bình luận"
+  }
+}

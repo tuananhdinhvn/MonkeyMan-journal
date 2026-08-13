@@ -1,0 +1,76 @@
+{
+  "nav": {
+    "home": "Home",
+    "travels": "Travels",
+    "experiences": "Experiences",
+    "movies": "Movies",
+    "contact": "Contact"
+  },
+  "home": {
+    "hero_title": "Discover Vietnam",
+    "hero_subtitle": "with MonkeyMan",
+    "hero_description": "I'm Tuan Anh — a Vietnamese travel guide passionate about sharing the hidden gems and breathtaking landscapes of Vietnam with the world.",
+    "hero_cta": "Explore Trips",
+    "hero_contact": "Get in Touch",
+    "about_title": "About Me",
+    "about_description": "Born and raised in Vietnam, I've spent years exploring every corner of this incredible country. From the emerald waters of Ha Long Bay to the golden lanterns of Hoi An, I'm here to help you experience Vietnam like a local.",
+    "featured_trips": "Featured Trips",
+    "featured_trips_subtitle": "Handpicked adventures across Vietnam",
+    "customer_experiences": "What Travelers Say",
+    "customer_experiences_subtitle": "Real stories from real adventurers",
+    "favorite_movies": "Movie Corner",
+    "favorite_movies_subtitle": "Films that inspire my journeys",
+    "view_all": "View All"
+  },
+  "travels": {
+    "title": "Travel Diaries",
+    "subtitle": "Every journey tells a story",
+    "all_trips": "All Trips",
+    "read_more": "Read More",
+    "back": "← Back to Travels",
+    "location": "Location",
+    "duration": "Duration",
+    "best_time": "Best Time to Visit",
+    "gallery": "Photo Gallery",
+    "share": "Share this trip"
+  },
+  "experiences": {
+    "title": "Traveler Experiences",
+    "subtitle": "Stories shared by those who've explored Vietnam with me",
+    "from": "From"
+  },
+  "movies": {
+    "title": "Movie Corner",
+    "subtitle": "Films I love and recommend",
+    "genre": "Genre",
+    "year": "Year",
+    "rating": "My Rating"
+  },
+  "contact": {
+    "title": "Get in Touch",
+    "subtitle": "Let's plan your Vietnam adventure together",
+    "email_label": "Email",
+    "phone_label": "Phone",
+    "social_label": "Follow Me",
+    "form_name": "Your Name",
+    "form_email": "Your Email",
+    "form_message": "Your Message",
+    "form_submit": "Send Message",
+    "form_sending": "Sending...",
+    "form_success": "Message sent! I'll get back to you soon.",
+    "form_error": "Something went wrong. Please try again."
+  },
+  "footer": {
+    "tagline": "Your guide to exploring Vietnam",
+    "rights": "All rights reserved"
+  },
+  "comments": {
+    "title": "Comments",
+    "login_prompt": "Sign in to leave a comment",
+    "login_google": "Continue with Google",
+    "login_facebook": "Continue with Facebook",
+    "placeholder": "Share your thoughts...",
+    "submit": "Post Comment",
+    "count": "{count} comments"
+  }
+}

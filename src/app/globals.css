@@ -7,5 +7,43 @@ html {
 }
 
 body {
-  @apply bg-white text-neutral-900 antialiased dark:bg-neutral-950 dark:text-neutral-100;
+  @apply bg-white text-ink antialiased;
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+/* Wanderland exact styles */
+.wl-category {
+  @apply text-sage text-[11px] uppercase tracking-widest3 font-sans font-semibold;
+}
+
+.wl-meta {
+  @apply text-meta text-sm font-sans;
+}
+
+.wl-title {
+  @apply font-serif font-bold text-ink leading-tight;
+}
+
+.wl-link {
+  @apply text-[11px] uppercase tracking-widest2 font-semibold font-sans text-ink
+         border-b border-ink/30 hover:border-ink pb-px transition-colors inline-block;
+}
+
+.wl-section-label {
+  @apply text-[11px] uppercase tracking-widest3 text-meta font-sans font-semibold;
+}
+
+.wl-divider {
+  @apply border-t border-[#e5e5e5] w-full;
+}
+
+/* Thin line after category tag */
+.wl-category-line::after {
+  content: "";
+  display: block;
+  width: 30px;
+  height: 1px;
+  background: #59815b;
+  margin-top: 8px;
 }

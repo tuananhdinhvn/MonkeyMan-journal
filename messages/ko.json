@@ -1,0 +1,76 @@
+{
+  "nav": {
+    "home": "홈",
+    "travels": "여행",
+    "experiences": "여행 후기",
+    "movies": "영화",
+    "contact": "연락처"
+  },
+  "home": {
+    "hero_title": "베트남을 발견하세요",
+    "hero_subtitle": "몽키맨과 함께",
+    "hero_description": "안녕하세요, 저는 뚜언 아인입니다 — 베트남의 숨겨진 명소와 아름다운 풍경을 세계와 나누는 데 열정적인 베트남 여행 가이드입니다.",
+    "hero_cta": "여행 둘러보기",
+    "hero_contact": "문의하기",
+    "about_title": "소개",
+    "about_description": "베트남에서 태어나고 자란 저는 수년간 이 놀라운 나라 곳곳을 탐험해 왔습니다. 하롱베이의 에메랄드빛 바다부터 호이안의 황금 등불까지, 저는 여러분이 현지인처럼 베트남을 경험할 수 있도록 안내해 드립니다.",
+    "featured_trips": "추천 여행",
+    "featured_trips_subtitle": "베트남 전역의 엄선된 모험",
+    "customer_experiences": "여행자 이야기",
+    "customer_experiences_subtitle": "실제 여행자들의 진짜 이야기",
+    "favorite_movies": "영화 코너",
+    "favorite_movies_subtitle": "여행에 영감을 주는 영화들",
+    "view_all": "전체 보기"
+  },
+  "travels": {
+    "title": "여행 일기",
+    "subtitle": "모든 여정에는 이야기가 있습니다",
+    "all_trips": "모든 여행",
+    "read_more": "더 읽기",
+    "back": "← 여행으로 돌아가기",
+    "location": "위치",
+    "duration": "기간",
+    "best_time": "최적 방문 시기",
+    "gallery": "사진 갤러리",
+    "share": "이 여행 공유하기"
+  },
+  "experiences": {
+    "title": "여행자 경험담",
+    "subtitle": "저와 함께 베트남을 탐험한 분들의 이야기",
+    "from": "출신"
+  },
+  "movies": {
+    "title": "영화 코너",
+    "subtitle": "제가 좋아하고 추천하는 영화들",
+    "genre": "장르",
+    "year": "연도",
+    "rating": "내 평점"
+  },
+  "contact": {
+    "title": "연락하기",
+    "subtitle": "함께 베트남 모험을 계획해 봅시다",
+    "email_label": "이메일",
+    "phone_label": "전화",
+    "social_label": "팔로우하기",
+    "form_name": "이름",
+    "form_email": "이메일",
+    "form_message": "메시지",
+    "form_submit": "메시지 보내기",
+    "form_sending": "전송 중...",
+    "form_success": "메시지가 전송되었습니다! 곧 답변 드리겠습니다.",
+    "form_error": "오류가 발생했습니다. 다시 시도해 주세요."
+  },
+  "footer": {
+    "tagline": "베트남 탐험을 위한 가이드",
+    "rights": "모든 권리 보유"
+  },
+  "comments": {
+    "title": "댓글",
+    "login_prompt": "댓글을 남기려면 로그인하세요",
+    "login_google": "Google로 계속하기",
+    "login_facebook": "Facebook으로 계속하기",
+    "placeholder": "생각을 공유해 주세요...",
+    "submit": "댓글 작성",
+    "count": "댓글 {count}개"
+  }
+}
