@@ -264,26 +264,29 @@ export default function MovieSection({ movies: propMovies, locale, sectionLabel,
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="relative flex items-center justify-center p-5 border-b border-[#e8e8e8]">
-                {fromList && (
-                  <button
-                    onClick={closeDetail}
-                    className="absolute left-5 flex items-center gap-1.5 text-[10px] uppercase tracking-widest font-semibold font-sans text-meta hover:text-sage transition-colors"
-                  >
-                    <ArrowLeft size={12} />
-                    {LABEL.backList[locale]}
+              <div className="border-b border-[#e8e8e8]">
+                {/* Row 1: back button + close */}
+                <div className="flex items-center justify-between px-5 pt-4 pb-2">
+                  {fromList ? (
+                    <button
+                      onClick={closeDetail}
+                      className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest font-semibold font-sans text-meta hover:text-sage transition-colors"
+                    >
+                      <ArrowLeft size={12} />
+                      {LABEL.backList[locale]}
+                    </button>
+                  ) : <span />}
+                  <button onClick={closeDetail} className="text-meta hover:text-ink transition-colors p-2 rounded-full hover:bg-gray-100">
+                    <X size={20} />
                   </button>
-                )}
-                <div className="text-center">
-                  
+                </div>
+                {/* Row 2: title + year */}
+                <div className="text-center px-5 pb-4">
                   <h3 className="wl-title text-xl font-bold leading-snug">
                     {selected.title}
                     <span className="text-meta font-sans text-sm font-normal ml-2">({selected.year})</span>
                   </h3>
                 </div>
-                <button onClick={closeDetail} className="absolute right-5 text-meta hover:text-ink transition-colors p-2 rounded-full hover:bg-gray-100">
-                  <X size={20} />
-                </button>
               </div>
 
               {/* Body */}
