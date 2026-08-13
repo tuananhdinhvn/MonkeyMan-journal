@@ -110,7 +110,7 @@ export default function MovieSection({ movies: propMovies, locale, sectionLabel,
           <h2 className="wl-title text-3xl sm:text-4xl">{sectionTitle}</h2>
           <button
             onClick={() => setShowAll(true)}
-            className="wl-link hidden sm:inline-block shrink-0 ml-6"
+            className="wl-link hidden lg:inline-block shrink-0 ml-6"
           >
             {seeAll} →
           </button>
@@ -172,8 +172,8 @@ export default function MovieSection({ movies: propMovies, locale, sectionLabel,
         </div>
       )}
 
-      {/* See all — mobile only */}
-      <div className="mt-6 flex justify-center sm:hidden">
+      {/* See all — below grid on non-desktop */}
+      <div className="mt-6 flex justify-center lg:hidden">
         <button onClick={() => setShowAll(true)} className="wl-link">
           {seeAll} →
         </button>

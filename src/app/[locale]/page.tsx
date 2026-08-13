@@ -112,7 +112,7 @@ const destSlides = trips.slice(2, 6);
       {/* ══════════════════════════════════════════════
           3. personal intro
       ══════════════════════════════════════════════ */}
-      <section id="my-info" className="bg-cream py-[50px]">
+      <section id="my-info" className="bg-cream pt-[50px] pb-0">
         <div className="mx-auto max-w-8xl px-6 sm:px-10">
           <AnimateSection>
             <MyInfoSection locale={locale} />
@@ -132,7 +132,7 @@ const destSlides = trips.slice(2, 6);
       {/* ══════════════════════════════════════════════
           5. My album
       ══════════════════════════════════════════════ */}
-      <section id="my-album" className="pt-[50px]">
+      <section id="my-album" className="pt-0">
         <AnimateSection>
           <DestinationSlider trips={destSlides} locale={locale} />
         </AnimateSection>
