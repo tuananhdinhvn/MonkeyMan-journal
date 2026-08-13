@@ -1,6 +1,6 @@
 import { trips, movies } from '@/lib/data';
 import AnimateSection from '@/components/AnimateSection';
-import HeroSlider from '@/components/HeroSlider';
+// import HeroSlider from '@/components/HeroSlider';
 import DestinationSlider from '@/components/DestinationSlider';
 import HomeVideoHero from '@/components/HomeVideoHero';
 import MovieSection from '@/components/MovieSection';
@@ -99,8 +99,7 @@ export default async function HomePage({
   const locale = (rawLocale as Locale) || 'vi';
   const c = copy[locale];
 
-  const heroSlides = trips.slice(0, 3);
-  const destSlides = trips.slice(2, 6);
+const destSlides = trips.slice(2, 6);
 
   return (
     <div className="overflow-x-hidden">
@@ -126,9 +125,9 @@ export default async function HomePage({
 
 
       {/* ══════════════════════════════════════════════
-          1.  SLIDER
+          1.  SLIDER — temporarily hidden
       ══════════════════════════════════════════════ */}
-      <HeroSlider slides={heroSlides} locale={locale} readMore={c.readMore} byLabel={c.by} />
+      {/* <HeroSlider slides={heroSlides} locale={locale} readMore={c.readMore} byLabel={c.by} /> */}
 
       {/* ══════════════════════════════════════════════
           5. My album
