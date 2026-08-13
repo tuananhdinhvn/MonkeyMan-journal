@@ -36,15 +36,16 @@ const copy = {
     quote: '"Không phải điểm đến, mà là hành trình mới là điều đáng nhớ."',
     quoteBy: '— Tuấn Anh, MonkeyMan',
     /* Movies */
-    s5Label: 'GÓC PHIM',
-    s5Title: 'Phim tôi yêu thích',
-    s5All: 'Xem tất cả phim',
+    s5Label: '',
+    s5Title: 'Bộ sưu tập phim của tôi',
+    s5Sub: 'Tôi yêu phim, đặc biệt là những bộ phim dựa trên câu chuyện có thật.',
+    s5All: 'Xem toàn bộ',
   },
   en: {
     readMore: 'Read More',
     by: 'by',
     s1Label: 'TRAVEL JOURNAL',
-    s1Title: 'My Recent Journeys',
+    s1Title: 'Unforgettable Memories',
     s1Sub: 'Capturing every moment along the roads I have traveled.',
     s1All: 'View All',
     nlLabel: 'FOLLOW MY JOURNEY',
@@ -58,9 +59,10 @@ const copy = {
     s4Label: 'RECENT ENTRIES',
     quote: '"It is not the destination but the journey itself that is worth remembering."',
     quoteBy: '— Tuan Anh, MonkeyMan',
-    s5Label: 'CINEMA CORNER',
-    s5Title: 'Films I Love',
-    s5All: 'See All Films',
+    s5Label: '',
+    s5Title: 'My movies collection',
+    s5Sub: 'I love movies, especially the movies based on real stories.',
+    s5All: 'See all Collection',
   },
   ko: {
     readMore: '더 읽기',
@@ -80,9 +82,10 @@ const copy = {
     s4Label: '최근 게시물',
     quote: '"목적지가 아니라 여정 자체가 기억할 만한 것입니다."',
     quoteBy: '— 뚜언 아인, 몽키맨',
-    s5Label: '영화 코너',
-    s5Title: '내가 좋아하는 영화',
-    s5All: '모든 영화 보기',
+    s5Label: '',
+    s5Title: '나의 영화 컬렉션',
+    s5Sub: '나는 영화를 사랑합니다, 특히 실화를 바탕으로 한 영화들을.',
+    s5All: '전체 컬렉션 보기',
   },
 } satisfies Record<Locale, Record<string, string>>;
 
@@ -173,6 +176,7 @@ export default async function HomePage({
               locale={locale}
               sectionLabel={c.s5Label}
               sectionTitle={c.s5Title}
+              subtitle={c.s5Sub}
               seeAll={c.s5All}
             />
           </AnimateSection>

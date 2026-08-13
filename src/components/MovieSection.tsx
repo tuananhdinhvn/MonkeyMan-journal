@@ -13,6 +13,7 @@ interface Props {
   locale: Locale;
   sectionLabel: string;
   sectionTitle: string;
+  subtitle?: string;
   seeAll: string;
 }
 
@@ -32,7 +33,7 @@ function buildTrailerUrl(url: string) {
   return `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&modestbranding=1`;
 }
 
-export default function MovieSection({ movies: propMovies, locale, sectionLabel, sectionTitle, seeAll }: Props) {
+export default function MovieSection({ movies: propMovies, locale, sectionLabel, sectionTitle, subtitle, seeAll }: Props) {
   const [page, setPage]         = useState(0);
   const [showAll, setShowAll]   = useState(false);
   const [selected, setSelected] = useState<Movie | null>(null);
@@ -105,8 +106,9 @@ export default function MovieSection({ movies: propMovies, locale, sectionLabel,
       {/* ── Section header ── */}
       <div className="flex items-end justify-between mb-12">
         <div>
-          <p className="wl-section-label mb-2">{sectionLabel}</p>
+          {sectionLabel && <p className="wl-section-label mb-2">{sectionLabel}</p>}
           <h2 className="wl-title text-3xl sm:text-4xl">{sectionTitle}</h2>
+          {subtitle && <p className="text-meta text-[15px] leading-relaxed mt-3">{subtitle}</p>}
         </div>
         <button
           onClick={() => setShowAll(true)}

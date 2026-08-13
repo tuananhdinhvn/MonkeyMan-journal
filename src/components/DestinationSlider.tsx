@@ -78,11 +78,11 @@ export default function DestinationSlider({ trips: propTrips, locale }: Props) {
   return (
     <>
       {/* ── Album card ── */}
-      <div className="flex flex-col lg:flex-row gap-0">
+      <div className="flex flex-col lg:flex-row lg:h-[560px] gap-0">
 
         {/* Left: main cover image */}
         <div
-          className="relative lg:w-[58%] aspect-[4/3] lg:aspect-auto lg:min-h-[520px] overflow-hidden bg-ink cursor-pointer group"
+          className="relative lg:w-[58%] aspect-[4/3] lg:aspect-auto lg:h-full overflow-hidden bg-ink cursor-pointer group"
           onClick={() => openLightbox(0)}
         >
           <AnimatePresence mode="sync">
@@ -110,7 +110,7 @@ export default function DestinationSlider({ trips: propTrips, locale }: Props) {
         </div>
 
         {/* Right: info + thumbnails */}
-        <div className="lg:w-[42%] bg-cream flex flex-col justify-center px-10 lg:px-14 py-14 min-h-[420px]">
+        <div className="lg:w-[42%] bg-cream flex flex-col justify-center px-10 lg:px-14 py-14 h-[420px] lg:h-full overflow-hidden">
           <AnimatePresence mode="wait">
             <motion.div
               key={trip.slug + '-txt'}
