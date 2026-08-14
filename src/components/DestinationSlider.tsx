@@ -43,20 +43,24 @@ export default function DestinationSlider({ albums: propAlbums, locale }: Props)
 
   const albums = (lsAlbums && lsAlbums.length > 0) ? lsAlbums : (lsAlbums === null ? propAlbums : []);
 
+  const goNext = useCallback(
+    () => setActive((a) => (a + 1) % Math.max(albums.length, 1)),
+    [albums.length]
+  );
+
+  // Auto-advance albums, pause when lightbox is open
+  useEffect(() => {
+    if (lightboxOpen || albums.length === 0) return;
+    const t = setInterval(goNext, AUTO_INTERVAL);
+    return () => clearInterval(t);
+  }, [goNext, lightboxOpen, albums.length]);
+
   if (albums.length === 0) return null;
 
   const album = albums[Math.min(active, albums.length - 1)] ?? albums[0];
   const images = album.photos.length > 0 ? album.photos.map(p => p.image) : [album.coverImage];
 
-  const goNext = useCallback(() => setActive((a) => (a + 1) % albums.length), [albums.length]);
   const goPrev = () => setActive((a) => (a - 1 + albums.length) % albums.length);
-
-  // Auto-advance albums, pause when lightbox is open
-  useEffect(() => {
-    if (lightboxOpen) return;
-    const t = setInterval(goNext, AUTO_INTERVAL);
-    return () => clearInterval(t);
-  }, [goNext, lightboxOpen]);
 
   const openLightbox = (idx = 0) => {
     setLightboxIdx(idx);

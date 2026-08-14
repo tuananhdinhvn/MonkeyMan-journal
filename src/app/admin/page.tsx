@@ -1223,17 +1223,48 @@ function SiteSettingsSection({ onSaved }: { onSaved: () => void }) {
   );
 }
 
+/* ─── Journal combined section (Albums + Journal posts) ──────────────────── */
+
+type JournalTab = 'album' | 'journal';
+
+function JournalCombinedSection({ onSaved }: { onSaved: () => void }) {
+  const [tab, setTab] = useState<JournalTab>('journal');
+  return (
+    <div>
+      <div className="flex gap-1 mb-8 border-b border-gray-100 pb-4">
+        <button
+          onClick={() => setTab('journal')}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            tab === 'journal' ? 'bg-gray-800 text-white' : 'border border-gray-200 text-gray-500 hover:bg-gray-50'
+          }`}
+        >
+          📝 Bài nhật ký
+        </button>
+        <button
+          onClick={() => setTab('album')}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            tab === 'album' ? 'bg-gray-800 text-white' : 'border border-gray-200 text-gray-500 hover:bg-gray-50'
+          }`}
+        >
+          🖼️ Album ảnh
+        </button>
+      </div>
+      {tab === 'journal' && <JournalAdminSection onSaved={onSaved} />}
+      {tab === 'album'   && <AlbumsSection       onSaved={onSaved} />}
+    </div>
+  );
+}
+
 /* ─── Main Admin Page ─────────────────────────────────────────────────────── */
 
-type Section = 'video' | 'info' | 'trips' | 'albums' | 'journal' | 'movies' | 'contacts' | 'settings';
+type Section = 'settings' | 'video' | 'info' | 'journal' | 'movies' | 'contacts';
 
 const SECTIONS: { id: Section; label: string; icon: string }[] = [
   { id: 'settings',  label: 'Cài đặt chung',    icon: '⚙️' },
   { id: 'video',     label: 'Video Intro',       icon: '🎬' },
   { id: 'info',      label: 'My Info',           icon: '👤' },
-  { id: 'albums',    label: 'My Album',          icon: '🖼️' },
   { id: 'journal',   label: 'My Journal',        icon: '📝' },
-  { id: 'movies',    label: 'Movies',            icon: '🎥' },
+  { id: 'movies',    label: 'My Movies',         icon: '🎥' },
   { id: 'contacts',  label: 'Call Me',           icon: '📞' },
 ];
 
@@ -1366,14 +1397,12 @@ export default function AdminPage() {
           </div>
         )}
         <div className="p-8 max-w-3xl">
-          {section === 'settings'  && <SiteSettingsSection  onSaved={showToast} />}
-          {section === 'video'     && <VideoSection         onSaved={showToast} />}
-          {section === 'info'      && <InfoSection          onSaved={showToast} />}
-          {section === 'trips'     && <TripsSection         onSaved={showToast} />}
-          {section === 'albums'    && <AlbumsSection        onSaved={showToast} />}
-          {section === 'journal'   && <JournalAdminSection  onSaved={showToast} />}
-          {section === 'movies'    && <MoviesSection        onSaved={showToast} />}
-          {section === 'contacts'  && <ContactsSection      onSaved={showToast} />}
+          {section === 'settings'  && <SiteSettingsSection      onSaved={showToast} />}
+          {section === 'video'     && <VideoSection              onSaved={showToast} />}
+          {section === 'info'      && <InfoSection               onSaved={showToast} />}
+          {section === 'journal'   && <JournalCombinedSection    onSaved={showToast} />}
+          {section === 'movies'    && <MoviesSection             onSaved={showToast} />}
+          {section === 'contacts'  && <ContactsSection           onSaved={showToast} />}
         </div>
       </main>
     </div>
