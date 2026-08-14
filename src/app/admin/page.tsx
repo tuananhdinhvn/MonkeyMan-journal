@@ -331,7 +331,8 @@ function AlbumForm({ album, isNew, onChange, onSave, onCancel }: {
           </Field>
         </div>
 
-        <ImageInput label="Ảnh bìa" value={album.coverImage} onChange={url => set('coverImage', url)} />
+        <ImageInput label="Ảnh bìa" value={album.coverImage} onChange={url => set('coverImage', url)}
+          hint="Kích thước tối ưu: 1400 × 1050 px (tỉ lệ 4:3). Hệ thống tự nén ảnh khi upload." />
 
         {/* Photos array */}
         <div>

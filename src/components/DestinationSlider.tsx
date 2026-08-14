@@ -58,7 +58,8 @@ export default function DestinationSlider({ albums: propAlbums, locale }: Props)
   if (albums.length === 0) return null;
 
   const album = albums[Math.min(active, albums.length - 1)] ?? albums[0];
-  const images = album.photos.length > 0 ? album.photos.map(p => p.image) : [album.coverImage];
+  // Cover image always first, then the rest of the photos
+  const images = [album.coverImage, ...album.photos.map(p => p.image)];
 
   const goPrev = () => setActive((a) => (a - 1 + albums.length) % albums.length);
 
@@ -81,7 +82,8 @@ export default function DestinationSlider({ albums: propAlbums, locale }: Props)
     { year: 'numeric', month: 'long' }
   );
 
-  const currentCaption = album.photos[lightboxIdx]?.caption[locale];
+  // Index 0 = cover (no caption), index N = photos[N-1]
+  const currentCaption = lightboxIdx > 0 ? album.photos[lightboxIdx - 1]?.caption[locale] : undefined;
 
   return (
     <>
@@ -157,7 +159,7 @@ export default function DestinationSlider({ albums: propAlbums, locale }: Props)
                 <button
                   key={a.id}
                   onClick={() => setActive(i)}
-                  className={`relative h-16 w-[calc(33.333%-8px)] min-w-[calc(33.333%-8px)] snap-start shrink-0 overflow-hidden transition-all duration-300 ${
+                  className={`relative h-24 w-[calc(33.333%-8px)] min-w-[calc(33.333%-8px)] snap-start shrink-0 overflow-hidden transition-all duration-300 ${
                     i === active
                       ? 'opacity-100 ring-2 ring-sage ring-offset-1'
                       : 'opacity-45 hover:opacity-70'
@@ -212,7 +214,7 @@ export default function DestinationSlider({ albums: propAlbums, locale }: Props)
             </p>
 
             {/* Title */}
-            <p className="absolute top-14 left-1/2 -translate-x-1/2 text-white/70 text-sm font-serif whitespace-nowrap">
+            <p className="absolute top-14 left-1/2 -translate-x-1/2 text-white/70 text-base font-serif font-bold whitespace-nowrap">
               {album.name[locale]}
             </p>
 
@@ -247,13 +249,6 @@ export default function DestinationSlider({ albums: propAlbums, locale }: Props)
                   />
                 </motion.div>
               </AnimatePresence>
-
-              {/* Caption below image */}
-              {currentCaption && (
-                <p className="absolute -bottom-8 left-0 right-0 text-center text-white/70 text-sm font-serif">
-                  {currentCaption}
-                </p>
-              )}
             </div>
 
             {/* Next */}
@@ -264,24 +259,31 @@ export default function DestinationSlider({ albums: propAlbums, locale }: Props)
               <ChevronRight size={34} />
             </button>
 
-            {/* Thumbnail strip */}
+            {/* Caption + thumbnail strip — stacked with 20px gap */}
             <div
-              className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2"
+              className="absolute bottom-5 left-0 right-0 flex flex-col items-center gap-5"
               onClick={(e) => e.stopPropagation()}
             >
-              {images.map((img, i) => (
-                <button
-                  key={i}
-                  onClick={() => setLightboxIdx(i)}
-                  className={`relative w-14 h-10 overflow-hidden transition-all duration-200 ${
-                    i === lightboxIdx
-                      ? 'opacity-100 ring-2 ring-white ring-offset-1 ring-offset-black'
-                      : 'opacity-35 hover:opacity-65'
-                  }`}
-                >
-                  <SmartImage src={img} alt="" fill className="object-cover" />
-                </button>
-              ))}
+              {currentCaption && (
+                <p className="text-white/70 text-sm font-serif text-center px-10">
+                  {currentCaption}
+                </p>
+              )}
+              <div className="flex gap-2">
+                {images.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setLightboxIdx(i)}
+                    className={`relative w-14 h-10 overflow-hidden transition-all duration-200 ${
+                      i === lightboxIdx
+                        ? 'opacity-100 ring-2 ring-white ring-offset-1 ring-offset-black'
+                        : 'opacity-35 hover:opacity-65'
+                    }`}
+                  >
+                    <SmartImage src={img} alt="" fill className="object-cover" />
+                  </button>
+                ))}
+              </div>
             </div>
           </motion.div>
         )}
