@@ -542,7 +542,7 @@ function JournalPostForm({ post, isNew, onChange, onSave, onCancel }: {
           </div>
           <RichTextEditor
             key={contentTab}
-            value={post.content[contentTab]}
+            value={typeof post.content[contentTab] === 'string' ? post.content[contentTab] as string : ''}
             onChange={html => setLang('content', contentTab, html)}
             onImageUpload={handleImageUpload}
           />

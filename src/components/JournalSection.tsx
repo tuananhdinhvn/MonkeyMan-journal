@@ -4,10 +4,36 @@ import { useState, useEffect } from 'react';
 import SmartImage from './SmartImage';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { PortableText } from '@portabletext/react';
 import AnimateSection from './AnimateSection';
-import type { JournalPost } from '@/lib/data';
+import type { JournalPost, JournalContent } from '@/lib/data';
 
 type Locale = 'vi' | 'en' | 'ko';
+
+const contentStyle = {
+  fontFamily: 'var(--font-serif, Georgia, serif)',
+  color: 'var(--color-ink, #1a1a1a)',
+  fontSize: '16px',
+  lineHeight: '1.75',
+  marginBottom: '2rem',
+};
+
+function ContentRenderer({ content }: { content: JournalContent }) {
+  if (Array.isArray(content)) {
+    return (
+      <div className="prose max-w-none" style={contentStyle}>
+        <PortableText value={content} />
+      </div>
+    );
+  }
+  return (
+    <div
+      className="prose max-w-none"
+      style={contentStyle}
+      dangerouslySetInnerHTML={{ __html: content }}
+    />
+  );
+}
 
 interface Labels {
   sectionLabel: string;
@@ -193,17 +219,7 @@ export default function JournalSection({ posts: propPosts, locale, labels }: Pro
                     <p className="text-meta text-[15px] leading-relaxed mb-6 pb-6 border-b border-[#e8e8e8]">
                       {selected.summary[locale]}
                     </p>
-                    <div
-                      className="prose max-w-none"
-                      style={{
-                        fontFamily: 'var(--font-serif, Georgia, serif)',
-                        color: 'var(--color-ink, #1a1a1a)',
-                        fontSize: '16px',
-                        lineHeight: '1.75',
-                        marginBottom: '2rem',
-                      }}
-                      dangerouslySetInnerHTML={{ __html: selected.content[locale] }}
-                    />
+                    <ContentRenderer content={selected.content[locale]} />
                   </div>
                 </div>
               </div>

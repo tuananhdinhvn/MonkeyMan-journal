@@ -11,12 +11,16 @@ export type Album = {
   }>;
 };
 
+// content can be a Portable Text array (from Sanity) or an HTML string (legacy admin)
+export type PortableTextBlock = { _type: string; [key: string]: unknown }
+export type JournalContent = PortableTextBlock[] | string
+
 export type JournalPost = {
   id: string;
   coverImage: string;
   title: { vi: string; en: string; ko: string };
   summary: { vi: string; en: string; ko: string };
-  content: { vi: string; en: string; ko: string }; // HTML string
+  content: { vi: JournalContent; en: JournalContent; ko: JournalContent };
   date: string;
   location: string;
 };
