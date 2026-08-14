@@ -442,17 +442,6 @@ function AlbumsSection({ onSaved }: { onSaved: () => void }) {
         ))}
       </div>
 
-      <div className="mt-6 pt-4 border-t border-gray-100">
-        <Btn variant="secondary" onClick={() => {
-          if (confirm('Reset về dữ liệu gốc? Mọi thay đổi sẽ bị mất.')) {
-            localStorage.removeItem(K.albums);
-            setAlbums(staticAlbums);
-            onSaved();
-          }
-        }}>
-          Reset về dữ liệu gốc
-        </Btn>
-      </div>
     </div>
   );
 }
@@ -624,17 +613,6 @@ function JournalAdminSection({ onSaved }: { onSaved: () => void }) {
         ))}
       </div>
 
-      <div className="mt-6 pt-4 border-t border-gray-100">
-        <Btn variant="secondary" onClick={() => {
-          if (confirm('Reset về dữ liệu gốc? Mọi thay đổi sẽ bị mất.')) {
-            localStorage.removeItem(K.journal);
-            setPosts(staticJournalPosts);
-            onSaved();
-          }
-        }}>
-          Reset về dữ liệu gốc
-        </Btn>
-      </div>
     </div>
   );
 }
@@ -824,17 +802,6 @@ function TripsSection({ onSaved }: { onSaved: () => void }) {
         ))}
       </div>
 
-      <div className="mt-6 pt-4 border-t border-gray-100">
-        <Btn variant="secondary" onClick={() => {
-          if (confirm('Reset về dữ liệu gốc? Mọi thay đổi sẽ bị mất.')) {
-            localStorage.removeItem(K.trips);
-            setTrips(staticTrips);
-            onSaved();
-          }
-        }}>
-          Reset về dữ liệu gốc
-        </Btn>
-      </div>
     </div>
   );
 }
@@ -1018,17 +985,6 @@ function MoviesSection({ onSaved }: { onSaved: () => void }) {
         ))}
       </div>
 
-      <div className="mt-6 pt-4 border-t border-gray-100">
-        <Btn variant="secondary" onClick={() => {
-          if (confirm('Reset về dữ liệu gốc? Mọi thay đổi sẽ bị mất.')) {
-            localStorage.removeItem(K.movies);
-            setMovies(staticMovies);
-            onSaved();
-          }
-        }}>
-          Reset về dữ liệu gốc
-        </Btn>
-      </div>
     </div>
   );
 }
