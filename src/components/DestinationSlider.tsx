@@ -4,31 +4,31 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SmartImage from './SmartImage';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
-import type { Trip } from '@/lib/data';
+import type { Album } from '@/lib/data';
 
 interface Props {
-  trips: Trip[];
+  albums: Album[];
   locale: 'vi' | 'en' | 'ko';
 }
 
 const ALBUM_LABEL = { vi: 'Xem Album', en: 'View Album', ko: '앨범 보기' };
 const AUTO_INTERVAL = 5000;
 
-export default function DestinationSlider({ trips: propTrips, locale }: Props) {
+export default function DestinationSlider({ albums: propAlbums, locale }: Props) {
   const [active, setActive] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIdx, setLightboxIdx] = useState(0);
-  const [lsTrips, setLsTrips] = useState<Trip[] | null>(null);
+  const [lsAlbums, setLsAlbums] = useState<Album[] | null>(null);
 
   useEffect(() => {
     const load = () => {
       try {
-        const stored = localStorage.getItem('admin:trips');
+        const stored = localStorage.getItem('admin:albums');
         if (stored) {
-          const all: Trip[] = JSON.parse(stored);
-          setLsTrips(all.slice(0, Math.min(all.length, 6)));
+          const all: Album[] = JSON.parse(stored);
+          setLsAlbums(all.slice(0, Math.min(all.length, 6)));
         } else {
-          setLsTrips(null);
+          setLsAlbums(null);
         }
       } catch {}
     };
@@ -41,15 +41,15 @@ export default function DestinationSlider({ trips: propTrips, locale }: Props) {
     };
   }, []);
 
-  const trips = (lsTrips && lsTrips.length > 0) ? lsTrips : (lsTrips === null ? propTrips : []);
+  const albums = (lsAlbums && lsAlbums.length > 0) ? lsAlbums : (lsAlbums === null ? propAlbums : []);
 
-  if (trips.length === 0) return null;
+  if (albums.length === 0) return null;
 
-  const trip = trips[Math.min(active, trips.length - 1)] ?? trips[0];
-  const images = trip.gallery.length > 0 ? trip.gallery : [trip.coverImage];
+  const album = albums[Math.min(active, albums.length - 1)] ?? albums[0];
+  const images = album.photos.length > 0 ? album.photos.map(p => p.image) : [album.coverImage];
 
-  const goNext = useCallback(() => setActive((a) => (a + 1) % trips.length), [trips.length]);
-  const goPrev = () => setActive((a) => (a - 1 + trips.length) % trips.length);
+  const goNext = useCallback(() => setActive((a) => (a + 1) % albums.length), [albums.length]);
+  const goPrev = () => setActive((a) => (a - 1 + albums.length) % albums.length);
 
   // Auto-advance albums, pause when lightbox is open
   useEffect(() => {
@@ -72,10 +72,12 @@ export default function DestinationSlider({ trips: propTrips, locale }: Props) {
     setLightboxIdx((i) => (i - 1 + images.length) % images.length);
   };
 
-  const date = new Date(trip.date).toLocaleDateString(
+  const date = new Date(album.date).toLocaleDateString(
     locale === 'ko' ? 'ko-KR' : locale === 'en' ? 'en-US' : 'vi-VN',
     { year: 'numeric', month: 'long' }
   );
+
+  const currentCaption = album.photos[lightboxIdx]?.caption[locale];
 
   return (
     <>
@@ -89,7 +91,7 @@ export default function DestinationSlider({ trips: propTrips, locale }: Props) {
         >
           <AnimatePresence mode="sync">
             <motion.div
-              key={trip.slug}
+              key={album.id}
               initial={{ opacity: 0, scale: 1.04 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
@@ -97,8 +99,8 @@ export default function DestinationSlider({ trips: propTrips, locale }: Props) {
               className="absolute inset-0"
             >
               <SmartImage
-                src={trip.coverImage}
-                alt={trip.title[locale]}
+                src={album.coverImage}
+                alt={album.name[locale]}
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-700"
               />
@@ -118,20 +120,20 @@ export default function DestinationSlider({ trips: propTrips, locale }: Props) {
           <div className="flex-1 flex flex-col justify-center">
             <AnimatePresence mode="wait">
               <motion.div
-                key={trip.slug + '-txt'}
+                key={album.id + '-txt'}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] }}
               >
-                <p className="wl-meta mb-4">{date} &nbsp;·&nbsp; {trip.location}</p>
+                <p className="wl-meta mb-4">{date} &nbsp;·&nbsp; {album.location}</p>
 
                 <h2 className="wl-title text-3xl sm:text-4xl mb-5">
-                  {trip.title[locale]}
+                  {album.name[locale]}
                 </h2>
 
                 <p className="text-meta text-[15px] leading-relaxed mb-8">
-                  {trip.summary[locale]}
+                  {album.description[locale]}
                 </p>
 
                 <button
@@ -147,9 +149,9 @@ export default function DestinationSlider({ trips: propTrips, locale }: Props) {
           {/* ── Thumbnail nav — pinned to bottom ── */}
           <div className="mt-10 pt-8 border-t border-[#e0ddd3]">
             <div className="flex gap-3 overflow-x-auto pb-1 snap-x scrollbar-none">
-              {trips.map((t, i) => (
+              {albums.map((a, i) => (
                 <button
-                  key={t.slug}
+                  key={a.id}
                   onClick={() => setActive(i)}
                   className={`relative h-16 w-[calc(33.333%-8px)] min-w-[calc(33.333%-8px)] snap-start shrink-0 overflow-hidden transition-all duration-300 ${
                     i === active
@@ -157,7 +159,7 @@ export default function DestinationSlider({ trips: propTrips, locale }: Props) {
                       : 'opacity-45 hover:opacity-70'
                   }`}
                 >
-                  <SmartImage src={t.coverImage} alt={t.title[locale]} fill className="object-cover" />
+                  <SmartImage src={a.coverImage} alt={a.name[locale]} fill className="object-cover" />
                 </button>
               ))}
             </div>
@@ -207,7 +209,7 @@ export default function DestinationSlider({ trips: propTrips, locale }: Props) {
 
             {/* Title */}
             <p className="absolute top-14 left-1/2 -translate-x-1/2 text-white/70 text-sm font-serif whitespace-nowrap">
-              {trip.title[locale]}
+              {album.name[locale]}
             </p>
 
             {/* Prev */}
@@ -234,13 +236,20 @@ export default function DestinationSlider({ trips: propTrips, locale }: Props) {
                 >
                   <SmartImage
                     src={images[lightboxIdx]}
-                    alt={`${trip.title[locale]} — ${lightboxIdx + 1}`}
+                    alt={`${album.name[locale]} — ${lightboxIdx + 1}`}
                     fill
                     className="object-contain"
                     sizes="90vw"
                   />
                 </motion.div>
               </AnimatePresence>
+
+              {/* Caption below image */}
+              {currentCaption && (
+                <p className="absolute -bottom-8 left-0 right-0 text-center text-white/70 text-sm font-serif">
+                  {currentCaption}
+                </p>
+              )}
             </div>
 
             {/* Next */}

@@ -1,3 +1,26 @@
+export type Album = {
+  id: string;
+  name: { vi: string; en: string; ko: string };
+  description: { vi: string; en: string; ko: string };
+  coverImage: string;
+  location: string;
+  date: string;
+  photos: Array<{
+    image: string;
+    caption: { vi: string; en: string; ko: string };
+  }>;
+};
+
+export type JournalPost = {
+  id: string;
+  coverImage: string;
+  title: { vi: string; en: string; ko: string };
+  summary: { vi: string; en: string; ko: string };
+  content: { vi: string; en: string; ko: string }; // HTML string
+  date: string;
+  location: string;
+};
+
 export type Trip = {
   slug: string;
   title: { vi: string; en: string; ko: string };
@@ -419,3 +442,43 @@ export const movies: Movie[] = [
     ],
   },
 ];
+
+/* ─── Albums (derived from first 4 trips) ─────────────────────────────────── */
+
+export const albums: Album[] = trips.slice(0, 4).map((trip) => ({
+  id: trip.slug,
+  name: trip.title,
+  description: trip.summary,
+  coverImage: trip.coverImage,
+  location: trip.location,
+  date: trip.date,
+  photos: trip.gallery.map((image) => ({
+    image,
+    caption: { vi: '', en: '', ko: '' },
+  })),
+}));
+
+/* ─── Journal Posts (derived from all trips) ──────────────────────────────── */
+
+export const journalPosts: JournalPost[] = trips.map((trip) => ({
+  id: trip.slug,
+  coverImage: trip.coverImage,
+  title: trip.title,
+  summary: trip.summary,
+  content: {
+    vi: trip.content.vi
+      .split('\n\n')
+      .map((para) => `<p>${para.replace(/\n/g, '<br />')}</p>`)
+      .join('\n'),
+    en: trip.content.en
+      .split('\n\n')
+      .map((para) => `<p>${para.replace(/\n/g, '<br />')}</p>`)
+      .join('\n'),
+    ko: trip.content.ko
+      .split('\n\n')
+      .map((para) => `<p>${para.replace(/\n/g, '<br />')}</p>`)
+      .join('\n'),
+  },
+  date: trip.date,
+  location: trip.location,
+}));

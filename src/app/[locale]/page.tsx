@@ -1,4 +1,4 @@
-import { trips, movies } from '@/lib/data';
+import { movies, albums, journalPosts } from '@/lib/data';
 import AnimateSection from '@/components/AnimateSection';
 // import HeroSlider from '@/components/HeroSlider';
 import DestinationSlider from '@/components/DestinationSlider';
@@ -99,8 +99,6 @@ export default async function HomePage({
   const locale = (rawLocale as Locale) || 'vi';
   const c = copy[locale];
 
-const destSlides = trips.slice(2, 6);
-
   return (
     <div className="overflow-x-hidden">
 
@@ -134,7 +132,7 @@ const destSlides = trips.slice(2, 6);
       ══════════════════════════════════════════════ */}
       <section id="my-album" className="bg-cream pt-0">
         <AnimateSection>
-          <DestinationSlider trips={destSlides} locale={locale} />
+          <DestinationSlider albums={albums} locale={locale} />
         </AnimateSection>
       </section>
 
@@ -144,7 +142,7 @@ const destSlides = trips.slice(2, 6);
       <section id="my-journal" className="py-20 lg:py-28">
         <div className="mx-auto max-w-8xl px-6 sm:px-10">
           <JournalSection
-            trips={trips}
+            posts={journalPosts}
             locale={locale}
             labels={{
               sectionLabel: c.s1Label,

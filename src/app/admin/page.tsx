@@ -1,8 +1,11 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { trips as staticTrips, movies as staticMovies } from '@/lib/data';
-import type { Trip, Movie } from '@/lib/data';
+import dynamic from 'next/dynamic';
+import { trips as staticTrips, movies as staticMovies, albums as staticAlbums, journalPosts as staticJournalPosts } from '@/lib/data';
+import type { Trip, Movie, Album, JournalPost } from '@/lib/data';
+
+const RichTextEditor = dynamic(() => import('@/components/admin/RichTextEditor'), { ssr: false });
 
 /* ─── Storage helpers ─────────────────────────────────────────────────────── */
 
@@ -10,6 +13,8 @@ const K = {
   video:    'admin:video',
   info:     'admin:info',
   trips:    'admin:trips',
+  albums:   'admin:albums',
+  journal:  'admin:journal',
   movies:   'admin:movies',
   contacts: 'admin:contacts',
   settings: 'admin:siteSettings',
@@ -68,6 +73,26 @@ const BLANK_MOVIE: Movie = {
   genre: { vi: '', en: '', ko: '' }, rating: 8,
   poster: '', banner: '', trailer: '',
   impression: { vi: '', en: '', ko: '' }, related: [],
+};
+
+const BLANK_ALBUM: Album = {
+  id: '',
+  name: { vi: '', en: '', ko: '' },
+  description: { vi: '', en: '', ko: '' },
+  coverImage: '',
+  location: '',
+  date: new Date().toISOString().slice(0, 10),
+  photos: [],
+};
+
+const BLANK_POST: JournalPost = {
+  id: '',
+  coverImage: '',
+  title: { vi: '', en: '', ko: '' },
+  summary: { vi: '', en: '', ko: '' },
+  content: { vi: '', en: '', ko: '' },
+  date: new Date().toISOString().slice(0, 10),
+  location: '',
 };
 
 /* ─── Shared UI components ────────────────────────────────────────────────── */
@@ -254,6 +279,359 @@ function GalleryInput({ images, onChange }: {
         <UploadBtn onUploaded={url => add(url)} label="↑ Upload ảnh mới" />
       </div>
     </Field>
+  );
+}
+
+/* ─── Albums section ─────────────────────────────────────────────────────── */
+
+function AlbumForm({ album, isNew, onChange, onSave, onCancel }: {
+  album: Album; isNew: boolean;
+  onChange: (a: Album) => void;
+  onSave: () => void;
+  onCancel: () => void;
+}) {
+  const set = <Kk extends keyof Album>(field: Kk, val: Album[Kk]) => onChange({ ...album, [field]: val });
+  const setLang = (field: 'name' | 'description', lang: 'vi' | 'en' | 'ko', val: string) =>
+    onChange({ ...album, [field]: { ...album[field], [lang]: val } });
+
+  const updPhoto = (i: number, field: 'image' | 'vi' | 'en' | 'ko', val: string) =>
+    set('photos', album.photos.map((p, idx) => {
+      if (idx !== i) return p;
+      if (field === 'image') return { ...p, image: val };
+      return { ...p, caption: { ...p.caption, [field]: val } };
+    }));
+
+  const addPhoto = (url = '') =>
+    set('photos', [...album.photos, { image: url, caption: { vi: '', en: '', ko: '' } }]);
+
+  const removePhoto = (i: number) =>
+    set('photos', album.photos.filter((_, idx) => idx !== i));
+
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-8 pb-6 border-b border-gray-100">
+        <button onClick={onCancel} className="text-sm text-gray-400 hover:text-gray-600 transition-colors">
+          ← Quay lại
+        </button>
+        <h2 className="text-xl font-serif font-semibold text-gray-800">
+          {isNew ? 'Thêm album mới' : 'Sửa album'}
+        </h2>
+      </div>
+
+      <div className="space-y-6">
+        <LangRow label="Tên album" values={album.name} onChange={(l, v) => setLang('name', l, v)} />
+        <LangRow label="Mô tả" values={album.description} onChange={(l, v) => setLang('description', l, v)} multiline rows={3} />
+
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Địa điểm">
+            <Inp value={album.location} onChange={e => set('location', e.target.value)} placeholder="Quảng Ninh, Việt Nam" />
+          </Field>
+          <Field label="Ngày">
+            <Inp type="date" value={album.date} onChange={e => set('date', e.target.value)} />
+          </Field>
+        </div>
+
+        <ImageInput label="Ảnh bìa" value={album.coverImage} onChange={url => set('coverImage', url)} />
+
+        {/* Photos array */}
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+            Ảnh trong album ({album.photos.length})
+          </label>
+          <div className="space-y-3 mb-3">
+            {album.photos.map((photo, i) => (
+              <div key={i} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                <div className="flex items-center gap-2 mb-2">
+                  {photo.image && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={photo.image} alt="" className="w-14 h-9 object-cover rounded shrink-0 border border-gray-200" />
+                  )}
+                  <Inp value={photo.image} onChange={e => updPhoto(i, 'image', e.target.value)} placeholder="URL ảnh..." />
+                  <UploadBtn onUploaded={url => updPhoto(i, 'image', url)} label="↑" />
+                  <button
+                    type="button"
+                    onClick={() => removePhoto(i)}
+                    className="shrink-0 text-gray-300 hover:text-red-400 transition-colors text-lg leading-none px-1"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {(['vi', 'en', 'ko'] as const).map(lang => (
+                    <div key={lang}>
+                      <p className="text-[10px] text-gray-400 mb-1 font-semibold">
+                        {lang === 'vi' ? '🇻🇳 Caption' : lang === 'en' ? '🇺🇸 Caption' : '🇰🇷 캡션'}
+                      </p>
+                      <Inp value={photo.caption[lang]} onChange={e => updPhoto(i, lang, e.target.value)} placeholder="..." />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="flex gap-2">
+            <Btn variant="secondary" className="text-xs" onClick={() => addPhoto('')}>+ Thêm URL</Btn>
+            <UploadBtn onUploaded={url => addPhoto(url)} label="↑ Upload ảnh mới" />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex gap-3 mt-8 pt-6 border-t border-gray-100">
+        <Btn onClick={onSave}>Lưu</Btn>
+        <Btn variant="secondary" onClick={onCancel}>Huỷ</Btn>
+      </div>
+    </div>
+  );
+}
+
+function AlbumsSection({ onSaved }: { onSaved: () => void }) {
+  const [albums, setAlbums]     = useState<Album[]>(staticAlbums);
+  const [editing, setEditing]   = useState<Album | null>(null);
+  const [isNew, setIsNew]       = useState(false);
+
+  useEffect(() => setAlbums(rd(K.albums, staticAlbums)), []);
+
+  const commit = (updated: Album[]) => { wr(K.albums, updated); setAlbums(updated); onSaved(); };
+
+  const startEdit = (a: Album) => { setEditing({ ...a }); setIsNew(false); };
+  const startNew  = () => { setEditing({ ...BLANK_ALBUM, id: `album-${Date.now()}` }); setIsNew(true); };
+
+  const saveEdit = () => {
+    if (!editing) return;
+    commit(isNew ? [...albums, editing] : albums.map(a => a.id === editing.id ? editing : a));
+    setEditing(null);
+  };
+
+  const del = (id: string) => {
+    if (!confirm('Xoá album này?')) return;
+    commit(albums.filter(a => a.id !== id));
+  };
+
+  if (editing) return <AlbumForm album={editing} isNew={isNew} onChange={setEditing} onSave={saveEdit} onCancel={() => setEditing(null)} />;
+
+  return (
+    <div>
+      <div className="flex items-start justify-between mb-8 pb-6 border-b border-gray-100">
+        <div>
+          <h2 className="text-2xl font-serif font-semibold text-gray-800 mb-1">My Album</h2>
+          <p className="text-sm text-gray-500">Quản lý album ảnh của chuyến đi</p>
+        </div>
+        <Btn onClick={startNew}>+ Thêm album</Btn>
+      </div>
+
+      <div className="space-y-2">
+        {albums.map((a) => (
+          <div key={a.id} className="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-4 py-3">
+            <div className="flex items-center gap-3 min-w-0">
+              {a.coverImage && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={a.coverImage} alt="" className="w-12 h-8 object-cover rounded shrink-0" />
+              )}
+              <div className="min-w-0">
+                <p className="font-medium text-gray-800 text-sm truncate">{a.name.vi || a.id}</p>
+                <p className="text-xs text-gray-400">{a.location} · {a.date} · {a.photos.length} ảnh</p>
+              </div>
+            </div>
+            <div className="flex gap-2 shrink-0 ml-3">
+              <Btn variant="secondary" className="text-xs px-3 py-1.5" onClick={() => startEdit(a)}>Sửa</Btn>
+              <Btn variant="danger" className="text-xs px-3 py-1.5" onClick={() => del(a.id)}>Xoá</Btn>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-6 pt-4 border-t border-gray-100">
+        <Btn variant="secondary" onClick={() => {
+          if (confirm('Reset về dữ liệu gốc? Mọi thay đổi sẽ bị mất.')) {
+            localStorage.removeItem(K.albums);
+            setAlbums(staticAlbums);
+            onSaved();
+          }
+        }}>
+          Reset về dữ liệu gốc
+        </Btn>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Journal admin section ───────────────────────────────────────────────── */
+
+function JournalPostForm({ post, isNew, onChange, onSave, onCancel }: {
+  post: JournalPost; isNew: boolean;
+  onChange: (p: JournalPost) => void;
+  onSave: () => void;
+  onCancel: () => void;
+}) {
+  const [contentTab, setContentTab] = useState<'vi' | 'en' | 'ko'>('vi');
+  const imageInputRef = useRef<HTMLInputElement>(null);
+
+  const set = <Kk extends keyof JournalPost>(field: Kk, val: JournalPost[Kk]) =>
+    onChange({ ...post, [field]: val });
+  const setLang = (field: 'title' | 'summary' | 'content', lang: 'vi' | 'en' | 'ko', val: string) =>
+    onChange({ ...post, [field]: { ...post[field], [lang]: val } });
+
+  const handleImageUpload = (): Promise<string | null> => {
+    return new Promise((resolve) => {
+      const input = imageInputRef.current;
+      if (!input) { resolve(null); return; }
+      const handler = async () => {
+        input.removeEventListener('change', handler);
+        const file = input.files?.[0];
+        input.value = '';
+        if (!file) { resolve(null); return; }
+        try {
+          const url = await resizeToDataUrl(file);
+          resolve(url);
+        } catch {
+          resolve(null);
+        }
+      };
+      input.addEventListener('change', handler);
+      input.click();
+    });
+  };
+
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-8 pb-6 border-b border-gray-100">
+        <button onClick={onCancel} className="text-sm text-gray-400 hover:text-gray-600 transition-colors">
+          ← Quay lại
+        </button>
+        <h2 className="text-xl font-serif font-semibold text-gray-800">
+          {isNew ? 'Thêm bài nhật ký mới' : 'Sửa bài nhật ký'}
+        </h2>
+      </div>
+
+      {/* Hidden file input for image upload in editor */}
+      <input
+        ref={imageInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+      />
+
+      <div className="space-y-6">
+        <ImageInput label="Ảnh bìa" value={post.coverImage} onChange={url => set('coverImage', url)} />
+
+        <LangRow label="Tiêu đề" values={post.title} onChange={(l, v) => setLang('title', l, v)} />
+        <LangRow label="Tóm tắt ngắn" values={post.summary} onChange={(l, v) => setLang('summary', l, v)} multiline rows={2} />
+
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Địa điểm">
+            <Inp value={post.location} onChange={e => set('location', e.target.value)} placeholder="Quảng Ninh, Việt Nam" />
+          </Field>
+          <Field label="Ngày">
+            <Inp type="date" value={post.date} onChange={e => set('date', e.target.value)} />
+          </Field>
+        </div>
+
+        {/* Content with language tabs */}
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+            Nội dung bài viết
+          </label>
+          <div className="flex gap-1 mb-3">
+            {(['vi', 'en', 'ko'] as const).map(lang => (
+              <button
+                key={lang}
+                type="button"
+                onClick={() => setContentTab(lang)}
+                className={`px-3 py-1.5 text-xs font-semibold rounded transition-colors ${
+                  contentTab === lang
+                    ? 'bg-gray-800 text-white'
+                    : 'border border-gray-200 text-gray-500 hover:bg-gray-50'
+                }`}
+              >
+                {lang === 'vi' ? '🇻🇳 VI' : lang === 'en' ? '🇺🇸 EN' : '🇰🇷 KO'}
+              </button>
+            ))}
+          </div>
+          <RichTextEditor
+            key={contentTab}
+            value={post.content[contentTab]}
+            onChange={html => setLang('content', contentTab, html)}
+            onImageUpload={handleImageUpload}
+          />
+        </div>
+      </div>
+
+      <div className="flex gap-3 mt-8 pt-6 border-t border-gray-100">
+        <Btn onClick={onSave}>Lưu</Btn>
+        <Btn variant="secondary" onClick={onCancel}>Huỷ</Btn>
+      </div>
+    </div>
+  );
+}
+
+function JournalAdminSection({ onSaved }: { onSaved: () => void }) {
+  const [posts, setPosts]       = useState<JournalPost[]>(staticJournalPosts);
+  const [editing, setEditing]   = useState<JournalPost | null>(null);
+  const [isNew, setIsNew]       = useState(false);
+
+  useEffect(() => setPosts(rd(K.journal, staticJournalPosts)), []);
+
+  const commit = (updated: JournalPost[]) => { wr(K.journal, updated); setPosts(updated); onSaved(); };
+
+  const startEdit = (p: JournalPost) => { setEditing({ ...p }); setIsNew(false); };
+  const startNew  = () => { setEditing({ ...BLANK_POST, id: `post-${Date.now()}` }); setIsNew(true); };
+
+  const saveEdit = () => {
+    if (!editing) return;
+    commit(isNew ? [...posts, editing] : posts.map(p => p.id === editing.id ? editing : p));
+    setEditing(null);
+  };
+
+  const del = (id: string) => {
+    if (!confirm('Xoá bài viết này?')) return;
+    commit(posts.filter(p => p.id !== id));
+  };
+
+  if (editing) return <JournalPostForm post={editing} isNew={isNew} onChange={setEditing} onSave={saveEdit} onCancel={() => setEditing(null)} />;
+
+  return (
+    <div>
+      <div className="flex items-start justify-between mb-8 pb-6 border-b border-gray-100">
+        <div>
+          <h2 className="text-2xl font-serif font-semibold text-gray-800 mb-1">My Journal</h2>
+          <p className="text-sm text-gray-500">Quản lý bài nhật ký du lịch</p>
+        </div>
+        <Btn onClick={startNew}>+ Thêm bài viết</Btn>
+      </div>
+
+      <div className="space-y-2">
+        {posts.map((p) => (
+          <div key={p.id} className="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-4 py-3">
+            <div className="flex items-center gap-3 min-w-0">
+              {p.coverImage && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={p.coverImage} alt="" className="w-12 h-8 object-cover rounded shrink-0" />
+              )}
+              <div className="min-w-0">
+                <p className="font-medium text-gray-800 text-sm truncate">{p.title.vi || p.id}</p>
+                <p className="text-xs text-gray-400">{p.location} · {p.date}</p>
+              </div>
+            </div>
+            <div className="flex gap-2 shrink-0 ml-3">
+              <Btn variant="secondary" className="text-xs px-3 py-1.5" onClick={() => startEdit(p)}>Sửa</Btn>
+              <Btn variant="danger" className="text-xs px-3 py-1.5" onClick={() => del(p.id)}>Xoá</Btn>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-6 pt-4 border-t border-gray-100">
+        <Btn variant="secondary" onClick={() => {
+          if (confirm('Reset về dữ liệu gốc? Mọi thay đổi sẽ bị mất.')) {
+            localStorage.removeItem(K.journal);
+            setPosts(staticJournalPosts);
+            onSaved();
+          }
+        }}>
+          Reset về dữ liệu gốc
+        </Btn>
+      </div>
+    </div>
   );
 }
 
@@ -847,13 +1225,14 @@ function SiteSettingsSection({ onSaved }: { onSaved: () => void }) {
 
 /* ─── Main Admin Page ─────────────────────────────────────────────────────── */
 
-type Section = 'video' | 'info' | 'trips' | 'movies' | 'contacts' | 'settings';
+type Section = 'video' | 'info' | 'trips' | 'albums' | 'journal' | 'movies' | 'contacts' | 'settings';
 
 const SECTIONS: { id: Section; label: string; icon: string }[] = [
   { id: 'settings',  label: 'Cài đặt chung',    icon: '⚙️' },
   { id: 'video',     label: 'Video Intro',       icon: '🎬' },
   { id: 'info',      label: 'My Info',           icon: '👤' },
-  { id: 'trips',     label: 'Albums / Journal',  icon: '🗺️' },
+  { id: 'albums',    label: 'My Album',          icon: '🖼️' },
+  { id: 'journal',   label: 'My Journal',        icon: '📝' },
   { id: 'movies',    label: 'Movies',            icon: '🎥' },
   { id: 'contacts',  label: 'Call Me',           icon: '📞' },
 ];
@@ -987,12 +1366,14 @@ export default function AdminPage() {
           </div>
         )}
         <div className="p-8 max-w-3xl">
-          {section === 'settings'  && <SiteSettingsSection onSaved={showToast} />}
-          {section === 'video'     && <VideoSection        onSaved={showToast} />}
-          {section === 'info'      && <InfoSection         onSaved={showToast} />}
-          {section === 'trips'     && <TripsSection        onSaved={showToast} />}
-          {section === 'movies'    && <MoviesSection       onSaved={showToast} />}
-          {section === 'contacts'  && <ContactsSection     onSaved={showToast} />}
+          {section === 'settings'  && <SiteSettingsSection  onSaved={showToast} />}
+          {section === 'video'     && <VideoSection         onSaved={showToast} />}
+          {section === 'info'      && <InfoSection          onSaved={showToast} />}
+          {section === 'trips'     && <TripsSection         onSaved={showToast} />}
+          {section === 'albums'    && <AlbumsSection        onSaved={showToast} />}
+          {section === 'journal'   && <JournalAdminSection  onSaved={showToast} />}
+          {section === 'movies'    && <MoviesSection        onSaved={showToast} />}
+          {section === 'contacts'  && <ContactsSection      onSaved={showToast} />}
         </div>
       </main>
     </div>

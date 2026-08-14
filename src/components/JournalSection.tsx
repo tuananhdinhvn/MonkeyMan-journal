@@ -4,9 +4,8 @@ import { useState, useEffect } from 'react';
 import SmartImage from './SmartImage';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Link } from '@/i18n/navigation';
 import AnimateSection from './AnimateSection';
-import type { Trip } from '@/lib/data';
+import type { JournalPost } from '@/lib/data';
 
 type Locale = 'vi' | 'en' | 'ko';
 
@@ -19,7 +18,7 @@ interface Labels {
 }
 
 interface Props {
-  trips: Trip[];
+  posts: JournalPost[];
   locale: Locale;
   labels: Labels;
 }
@@ -33,16 +32,16 @@ function fmtDate(d: string, locale: Locale) {
   );
 }
 
-export default function JournalSection({ trips: propTrips, locale, labels }: Props) {
-  const [page, setPage]         = useState(0);
-  const [selected, setSelected] = useState<Trip | null>(null);
-  const [lsTrips, setLsTrips]   = useState<Trip[] | null>(null);
+export default function JournalSection({ posts: propPosts, locale, labels }: Props) {
+  const [page, setPage]           = useState(0);
+  const [selected, setSelected]   = useState<JournalPost | null>(null);
+  const [lsPosts, setLsPosts]     = useState<JournalPost[] | null>(null);
 
   useEffect(() => {
     const load = () => {
       try {
-        const stored = localStorage.getItem('admin:trips');
-        setLsTrips(stored ? JSON.parse(stored) : null);
+        const stored = localStorage.getItem('admin:journal');
+        setLsPosts(stored ? JSON.parse(stored) : null);
       } catch {}
     };
     load();
@@ -54,35 +53,33 @@ export default function JournalSection({ trips: propTrips, locale, labels }: Pro
     };
   }, []);
 
-  const trips = lsTrips ?? propTrips;
+  const posts = lsPosts ?? propPosts;
 
-  const totalPages = Math.ceil(trips.length / PAGE_SIZE);
-  const visible    = trips.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+  const totalPages = Math.ceil(posts.length / PAGE_SIZE);
+  const visible    = posts.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
-  const open  = (trip: Trip) => setSelected(trip);
+  const open  = (post: JournalPost) => setSelected(post);
   const close = () => setSelected(null);
 
   return (
     <>
       {/* Section header */}
       <AnimateSection className="text-center mb-16">
-        
         <h2 className="wl-title text-4xl sm:text-5xl mb-3">{labels.title}</h2>
-        
       </AnimateSection>
 
       {/* Posts list */}
       <div className="divide-y divide-[#e5e5e5]">
-        {visible.map((trip, idx) => (
-          <AnimateSection key={trip.slug} delay={idx * 0.07} className="py-14">
+        {visible.map((post, idx) => (
+          <AnimateSection key={post.id} delay={idx * 0.07} className="py-14">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-start">
 
               {/* Image */}
-              <button onClick={() => open(trip)} className="text-left group">
+              <button onClick={() => open(post)} className="text-left group">
                 <div className="relative aspect-[4/3] overflow-hidden bg-gray-100 rounded-[10px]">
                   <SmartImage
-                    src={trip.coverImage}
-                    alt={trip.title[locale]}
+                    src={post.coverImage}
+                    alt={post.title[locale]}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-700"
                   />
@@ -91,16 +88,18 @@ export default function JournalSection({ trips: propTrips, locale, labels }: Pro
 
               {/* Text */}
               <div className="lg:pl-6 lg:pt-0">
-                
-                <button onClick={() => open(trip)} className="text-left w-full">
+                <p className="text-xs text-gray-400 mb-3 font-sans uppercase tracking-wider">
+                  {fmtDate(post.date, locale)} · {post.location}
+                </p>
+                <button onClick={() => open(post)} className="text-left w-full">
                   <h3 className="wl-title text-[26px] sm:text-[32px] mb-5 hover:text-sage transition-colors leading-snug">
-                    {trip.title[locale]}
+                    {post.title[locale]}
                   </h3>
                 </button>
                 <p className="text-meta text-[15px] leading-relaxed mb-7">
-                  {trip.summary[locale]}
+                  {post.summary[locale]}
                 </p>
-                <button onClick={() => open(trip)} className="wl-link">
+                <button onClick={() => open(post)} className="wl-link">
                   {labels.readMore} →
                 </button>
               </div>
@@ -185,18 +184,26 @@ export default function JournalSection({ trips: propTrips, locale, labels }: Pro
                 {/* Right: scrollable content */}
                 <div className="md:w-[58%] overflow-y-auto">
                   <div className="p-8">
-                    
+                    <p className="text-xs text-gray-400 mb-3 font-sans uppercase tracking-wider">
+                      {fmtDate(selected.date, locale)} · {selected.location}
+                    </p>
                     <h2 className="wl-title text-2xl sm:text-3xl mb-5 leading-snug">
                       {selected.title[locale]}
                     </h2>
                     <p className="text-meta text-[15px] leading-relaxed mb-6 pb-6 border-b border-[#e8e8e8]">
                       {selected.summary[locale]}
                     </p>
-                    <div className="font-serif text-ink text-[16px] leading-relaxed whitespace-pre-line mb-8">
-                      {selected.content[locale]}
-                    </div>
-               
-               
+                    <div
+                      className="prose max-w-none"
+                      style={{
+                        fontFamily: 'var(--font-serif, Georgia, serif)',
+                        color: 'var(--color-ink, #1a1a1a)',
+                        fontSize: '16px',
+                        lineHeight: '1.75',
+                        marginBottom: '2rem',
+                      }}
+                      dangerouslySetInnerHTML={{ __html: selected.content[locale] }}
+                    />
                   </div>
                 </div>
               </div>
