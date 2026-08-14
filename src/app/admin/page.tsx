@@ -143,23 +143,25 @@ function LangRow({ label, values, onChange, multiline = false, rows = 3 }: {
 
 /* ─── Upload helpers ─────────────────────────────────────────────────────── */
 
-async function doUpload(file: File): Promise<string | null> {
-  const fd = new FormData();
-  fd.append('file', file);
-  try {
-    const res = await fetch('/api/upload', {
-      method: 'POST',
-      headers: { 'x-admin-password': PW },
-      body: fd,
-    });
-    const data = await res.json();
-    if (data.url) return data.url as string;
-    alert(data.error ?? 'Upload thất bại');
-    return null;
-  } catch {
-    alert('Upload thất bại — kiểm tra server');
-    return null;
-  }
+// Resize image client-side via canvas → JPEG data URL (no server needed)
+function resizeToDataUrl(file: File, maxPx = 1400, quality = 0.82): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const blobUrl = URL.createObjectURL(file);
+    const img = new window.Image();
+    img.onload = () => {
+      URL.revokeObjectURL(blobUrl);
+      const scale = Math.min(1, maxPx / Math.max(img.width, img.height));
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d')!.drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => { URL.revokeObjectURL(blobUrl); reject(new Error('load')); };
+    img.src = blobUrl;
+  });
 }
 
 function UploadBtn({ onUploaded, label = '↑ Upload' }: { onUploaded: (url: string) => void; label?: string }) {
@@ -173,7 +175,7 @@ function UploadBtn({ onUploaded, label = '↑ Upload' }: { onUploaded: (url: str
         disabled={loading}
         className="shrink-0 border border-dashed border-gray-300 rounded px-3 py-2 text-xs text-gray-500 hover:bg-gray-50 hover:border-gray-400 transition-colors disabled:opacity-40 whitespace-nowrap"
       >
-        {loading ? 'Đang tải...' : label}
+        {loading ? 'Đang xử lý...' : label}
       </button>
       <input
         ref={ref}
@@ -185,8 +187,12 @@ function UploadBtn({ onUploaded, label = '↑ Upload' }: { onUploaded: (url: str
           if (!file) return;
           e.target.value = '';
           setLoading(true);
-          const url = await doUpload(file);
-          if (url) onUploaded(url);
+          try {
+            const dataUrl = await resizeToDataUrl(file);
+            onUploaded(dataUrl);
+          } catch {
+            alert('Không thể đọc ảnh — thử lại');
+          }
           setLoading(false);
         }}
       />

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import SmartImage from './SmartImage';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
@@ -80,7 +80,7 @@ export default function JournalSection({ trips: propTrips, locale, labels }: Pro
               {/* Image */}
               <button onClick={() => open(trip)} className="text-left group">
                 <div className="relative aspect-[4/3] overflow-hidden bg-gray-100 rounded-[10px]">
-                  <Image
+                  <SmartImage
                     src={trip.coverImage}
                     alt={trip.title[locale]}
                     fill
@@ -174,7 +174,7 @@ export default function JournalSection({ trips: propTrips, locale, labels }: Pro
               <div className="flex flex-col md:flex-row max-h-[88vh]">
                 {/* Left: cover image */}
                 <div className="md:w-[42%] shrink-0 relative min-h-[240px] md:min-h-0">
-                  <Image
+                  <SmartImage
                     src={selected.coverImage}
                     alt={selected.title[locale]}
                     fill

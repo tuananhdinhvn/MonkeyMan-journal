@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import SmartImage from './SmartImage';
 
 type Locale = 'vi' | 'en' | 'ko';
 type MyInfo = {
@@ -47,7 +47,7 @@ export default function MyInfoSection({ locale }: { locale: Locale }) {
     <div className="flex flex-col md:flex-row items-center gap-0">
       <div className="md:w-[35%] flex justify-center">
         <div className="relative w-[260px] aspect-[3/4] overflow-hidden rounded-full">
-          <Image src={info.portraitImage} alt="MonkeyMan" fill className="object-cover" />
+          <SmartImage src={info.portraitImage} alt="MonkeyMan" fill className="object-cover" />
         </div>
       </div>
       <div className="md:w-[65%] px-8 md:px-10 lg:px-12 py-16 md:py-0">

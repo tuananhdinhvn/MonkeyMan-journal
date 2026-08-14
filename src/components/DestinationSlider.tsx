@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
+import SmartImage from './SmartImage';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Trip } from '@/lib/data';
 
@@ -96,7 +96,7 @@ export default function DestinationSlider({ trips: propTrips, locale }: Props) {
               transition={{ duration: 0.9, ease: 'easeInOut' }}
               className="absolute inset-0"
             >
-              <Image
+              <SmartImage
                 src={trip.coverImage}
                 alt={trip.title[locale]}
                 fill
@@ -157,7 +157,7 @@ export default function DestinationSlider({ trips: propTrips, locale }: Props) {
                       : 'opacity-45 hover:opacity-70'
                   }`}
                 >
-                  <Image src={t.coverImage} alt={t.title[locale]} fill className="object-cover" />
+                  <SmartImage src={t.coverImage} alt={t.title[locale]} fill className="object-cover" />
                 </button>
               ))}
             </div>
@@ -232,7 +232,7 @@ export default function DestinationSlider({ trips: propTrips, locale }: Props) {
                   transition={{ duration: 0.28 }}
                   className="absolute inset-0"
                 >
-                  <Image
+                  <SmartImage
                     src={images[lightboxIdx]}
                     alt={`${trip.title[locale]} — ${lightboxIdx + 1}`}
                     fill
@@ -266,7 +266,7 @@ export default function DestinationSlider({ trips: propTrips, locale }: Props) {
                       : 'opacity-35 hover:opacity-65'
                   }`}
                 >
-                  <Image src={img} alt="" fill className="object-cover" />
+                  <SmartImage src={img} alt="" fill className="object-cover" />
                 </button>
               ))}
             </div>

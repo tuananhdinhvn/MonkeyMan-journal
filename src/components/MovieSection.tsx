@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
+import SmartImage from './SmartImage';
 import { X, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
 import type { Movie } from '@/lib/data';
 
@@ -123,7 +123,7 @@ export default function MovieSection({ movies: propMovies, locale, sectionLabel,
           {visible.map((movie) => (
             <button key={movie.id} onClick={() => openFromGrid(movie)} className="group text-left">
               <div className="relative aspect-video overflow-hidden bg-gray-100 mb-4 rounded-[10px]">
-                <Image
+                <SmartImage
                   src={movie.banner}
                   alt={movie.title}
                   fill
@@ -210,7 +210,7 @@ export default function MovieSection({ movies: propMovies, locale, sectionLabel,
                       className="group text-left"
                     >
                       <div className="relative aspect-video overflow-hidden bg-gray-100 mb-3 rounded-[10px]">
-                        <Image
+                        <SmartImage
                           src={movie.banner}
                           alt={movie.title}
                           fill
@@ -288,7 +288,7 @@ export default function MovieSection({ movies: propMovies, locale, sectionLabel,
                   <AnimatePresence mode="wait">
                     {selImage ? (
                       <motion.div key="img" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="relative aspect-video">
-                        <Image src={selImage.src} alt="" fill className="object-contain" sizes="55vw" />
+                        <SmartImage src={selImage.src} alt="" fill className="object-contain" sizes="55vw" />
                       </motion.div>
                     ) : (
                       <motion.div key="video" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="relative aspect-video">
@@ -347,7 +347,7 @@ export default function MovieSection({ movies: propMovies, locale, sectionLabel,
                               selImage?.src === rel.image ? 'ring-2 ring-sage opacity-100' : 'opacity-60 hover:opacity-100'
                             }`}
                           >
-                            <Image src={rel.image} alt="" fill className="object-cover" sizes="15vw" />
+                            <SmartImage src={rel.image} alt="" fill className="object-cover" sizes="15vw" />
                           </button>
                         ))}
                       </div>
