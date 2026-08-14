@@ -1,8 +1,7 @@
+import { put } from '@vercel/blob';
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
 
-const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
+const MAX_SIZE = 10 * 1024 * 1024;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'];
 
 function checkAuth(req: NextRequest): boolean {
@@ -33,14 +32,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'File quá lớn (tối đa 10 MB)' }, { status: 400 });
   }
 
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-  await mkdir(uploadDir, { recursive: true });
-
-  const rawExt = file.name.split('.').pop() ?? 'jpg';
-  const safeExt = rawExt.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 5);
-  const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${safeExt}`;
-  await writeFile(path.join(uploadDir, filename), buffer);
-
-  return NextResponse.json({ url: `/uploads/${filename}` });
+  try {
+    const blob = await put(file.name, file, { access: 'public' });
+    return NextResponse.json({ url: blob.url });
+  } catch (err) {
+    console.error('Blob upload error:', err);
+    return NextResponse.json({ error: 'Upload thất bại — kiểm tra cấu hình Vercel Blob' }, { status: 500 });
+  }
 }

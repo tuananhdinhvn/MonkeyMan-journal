@@ -967,6 +967,14 @@ export default function AdminPage() {
 
       {/* Main content */}
       <main className="flex-1 overflow-y-auto">
+        {/* Top bar */}
+        <div className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200 px-8 py-3 flex justify-end">
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+          <a href="/" className="text-xs text-gray-400 hover:text-gray-700 transition-colors flex items-center gap-1">
+            ← Về trang blog
+          </a>
+        </div>
+
         {toast && (
           <div className="fixed top-4 right-4 z-50 bg-green-500 text-white text-sm px-4 py-2.5 rounded-lg shadow-lg font-medium">
             ✓ {toast}

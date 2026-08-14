@@ -41,7 +41,9 @@ export default function DestinationSlider({ trips: propTrips, locale }: Props) {
     };
   }, []);
 
-  const trips = lsTrips ?? propTrips;
+  const trips = (lsTrips && lsTrips.length > 0) ? lsTrips : (lsTrips === null ? propTrips : []);
+
+  if (trips.length === 0) return null;
 
   const trip = trips[Math.min(active, trips.length - 1)] ?? trips[0];
   const images = trip.gallery.length > 0 ? trip.gallery : [trip.coverImage];
