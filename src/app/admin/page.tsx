@@ -336,9 +336,10 @@ function AlbumForm({ album, isNew, onChange, onSave, onCancel }: {
 
         {/* Photos array */}
         <div>
-          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
             Ảnh trong album ({album.photos.length})
           </label>
+          <p className="text-xs text-gray-400 mb-3">Kích thước tối ưu: 1400 × 1050 px (tỉ lệ 4:3). Hệ thống tự nén ảnh khi upload.</p>
           <div className="space-y-3 mb-3">
             {album.photos.map((photo, i) => (
               <div key={i} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
@@ -513,7 +514,8 @@ function JournalPostForm({ post, isNew, onChange, onSave, onCancel }: {
       />
 
       <div className="space-y-6">
-        <ImageInput label="Ảnh bìa" value={post.coverImage} onChange={url => set('coverImage', url)} />
+        <ImageInput label="Ảnh bìa" value={post.coverImage} onChange={url => set('coverImage', url)}
+          hint="Kích thước tối ưu: 1200 × 900 px (tỉ lệ 4:3). Hệ thống tự nén ảnh khi upload." />
 
         <LangRow label="Tiêu đề" values={post.title} onChange={(l, v) => setLang('title', l, v)} />
         <LangRow label="Tóm tắt ngắn" values={post.summary} onChange={(l, v) => setLang('summary', l, v)} multiline rows={2} />
@@ -529,9 +531,10 @@ function JournalPostForm({ post, isNew, onChange, onSave, onCancel }: {
 
         {/* Content with language tabs */}
         <div>
-          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
             Nội dung bài viết
           </label>
+          <p className="text-xs text-gray-400 mb-3">Ảnh chèn vào bài: tối đa 1200 px chiều rộng, tỉ lệ tự do. Nhấn nút 📷 trong thanh công cụ để upload.</p>
           <div className="flex gap-1 mb-3">
             {(['vi', 'en', 'ko'] as const).map(lang => (
               <button
@@ -682,6 +685,7 @@ function InfoSection({ onSaved }: { onSaved: () => void }) {
           label="Ảnh chân dung"
           value={info.portraitImage}
           onChange={url => setInfo(p => ({ ...p, portraitImage: url }))}
+          hint="Kích thước tối ưu: 600 × 800 px (tỉ lệ 3:4, ảnh dọc). Sẽ hiển thị dạng hình oval trên trang chủ."
         />
         <LangRow label="Tiêu đề" values={info.title} onChange={(l, v) => setLang('title', l, v)} />
         <LangRow label="Mô tả ngắn" values={info.text} onChange={(l, v) => setLang('text', l, v)} multiline rows={3} />
@@ -888,7 +892,7 @@ function MovieForm({ movie, isNew, onChange, onSave, onCancel }: {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <ImageInput label="Ảnh bìa ngang (banner)" hint="Tỉ lệ 16:9"
+          <ImageInput label="Ảnh bìa ngang (banner)" hint="Kích thước tối ưu: 1280 × 720 px (tỉ lệ 16:9). Hệ thống tự nén ảnh khi upload."
             value={movie.banner} onChange={url => set('banner', url)} />
           <Field label="Link trailer YouTube">
             <Inp value={movie.trailer} onChange={e => set('trailer', e.target.value)} placeholder="https://www.youtube.com/watch?v=..." />
@@ -900,7 +904,7 @@ function MovieForm({ movie, isNew, onChange, onSave, onCancel }: {
 
         {/* Related images */}
         <div>
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-1">
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">
               Hình ảnh liên quan ({movie.related.length})
             </label>
@@ -908,6 +912,7 @@ function MovieForm({ movie, isNew, onChange, onSave, onCancel }: {
               + Thêm ảnh
             </button>
           </div>
+          <p className="text-xs text-gray-400 mb-3">Kích thước tối ưu: 1280 × 720 px (tỉ lệ 16:9). Hệ thống tự nén ảnh khi upload.</p>
           <div className="space-y-3">
             {movie.related.map((rel, i) => (
               <div key={i} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
@@ -1154,7 +1159,7 @@ function SiteSettingsSection({ onSaved }: { onSaved: () => void }) {
           label="Logo"
           value={s.logoUrl}
           onChange={url => upd('logoUrl', url)}
-          hint="Khuyến nghị: SVG hoặc PNG trong suốt"
+          hint="Khuyến nghị: SVG hoặc PNG nền trong suốt, ảnh vuông hoặc ngang, tối thiểu 200 × 60 px."
         />
 
         <ImageInput
