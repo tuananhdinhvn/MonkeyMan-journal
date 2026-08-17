@@ -111,9 +111,8 @@ export default function MovieSection({ movies, locale, sectionLabel, sectionTitl
                   src={movie.banner}
                   alt={movie.title}
                   fill
-                  className="object-cover brightness-105 group-hover:scale-105 transition-transform duration-700"
+                  className="object-cover brightness-125 group-hover:scale-105 transition-transform duration-700"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <span className="absolute bottom-2 right-2 bg-sage text-white text-[10px] px-2 py-0.5 font-sans font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
                   ★ {movie.rating}/10
                 </span>
@@ -203,9 +202,8 @@ export default function MovieSection({ movies, locale, sectionLabel, sectionTitl
                           src={movie.banner}
                           alt={movie.title}
                           fill
-                          className="object-cover brightness-105 group-hover:scale-105 transition-transform duration-500"
+                          className="object-cover brightness-125 group-hover:scale-105 transition-transform duration-500"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                         <span className="absolute bottom-2 right-2 bg-sage text-white text-[10px] px-2 py-0.5 font-sans font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
                           ★ {movie.rating}/10
                         </span>
@@ -261,7 +259,7 @@ export default function MovieSection({ movies, locale, sectionLabel, sectionTitl
                   </button>
                 )}
                 <h3 className="wl-title text-[23px] font-bold leading-snug">{selected.title}</h3>
-                <p className="text-meta font-sans text-[12px] mt-1">{selected.year}</p>
+                <p className="text-meta font-sans text-[14px] mt-1">{selected.year}</p>
                 <button onClick={closeDetail} className="absolute right-4 top-1/2 -translate-y-1/2 text-meta hover:text-ink transition-colors p-2 rounded-full hover:bg-gray-100">
                   <X size={20} />
                 </button>
