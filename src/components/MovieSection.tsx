@@ -102,10 +102,10 @@ export default function MovieSection({ movies, locale, sectionLabel, sectionTitl
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -16 }}
           transition={{ duration: 0.38 }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-6 min-h-[320px] content-start"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-6 min-h-[320px] content-start items-start"
         >
           {visible.map((movie) => (
-            <button key={movie.id} onClick={() => openFromGrid(movie)} className="group text-left">
+            <button key={movie.id} onClick={() => openFromGrid(movie)} className="group text-left self-start">
               <div className="relative aspect-video overflow-hidden bg-gray-100 mb-4 rounded-[10px]">
                 <SmartImage
                   src={movie.banner}
