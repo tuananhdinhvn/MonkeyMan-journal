@@ -313,26 +313,28 @@ export default function MovieSection({ movies, locale, sectionLabel, sectionTitl
                             <span className="text-meta text-xs ml-2 font-sans">{selected.rating}/10</span>
                           </div>
                           {(selected.director || selected.cast || selected.genre?.[locale]) && (
-                            <div className="space-y-1.5 mb-4 pb-4 border-b border-[#e8e8e8]">
-                              {selected.director && (
-                                <p className="text-xs font-sans text-meta">
-                                  <span className="font-semibold text-ink/70 uppercase tracking-wider text-[10px] mr-2">{LABEL.director[locale]}</span>
-                                  {selected.director}
-                                </p>
-                              )}
-                              {selected.cast && (
-                                <p className="text-xs font-sans text-meta">
-                                  <span className="font-semibold text-ink/70 uppercase tracking-wider text-[10px] mr-2">{LABEL.cast[locale]}</span>
-                                  {selected.cast}
-                                </p>
-                              )}
-                              {selected.genre?.[locale] && (
-                                <p className="text-xs font-sans text-meta">
-                                  <span className="font-semibold text-ink/70 uppercase tracking-wider text-[10px] mr-2">{LABEL.genre[locale]}</span>
-                                  {selected.genre[locale]}
-                                </p>
-                              )}
-                            </div>
+                            <table className="w-full mb-4 pb-4 border-b border-[#e8e8e8] text-xs font-sans border-collapse">
+                              <tbody>
+                                {selected.director && (
+                                  <tr>
+                                    <td className="text-[10px] font-semibold uppercase tracking-wider text-ink/50 pr-4 py-1 whitespace-nowrap w-px align-top">{LABEL.director[locale]}</td>
+                                    <td className="text-meta py-1">{selected.director}</td>
+                                  </tr>
+                                )}
+                                {selected.cast && (
+                                  <tr>
+                                    <td className="text-[10px] font-semibold uppercase tracking-wider text-ink/50 pr-4 py-1 whitespace-nowrap w-px align-top">{LABEL.cast[locale]}</td>
+                                    <td className="text-meta py-1">{selected.cast}</td>
+                                  </tr>
+                                )}
+                                {selected.genre?.[locale] && (
+                                  <tr>
+                                    <td className="text-[10px] font-semibold uppercase tracking-wider text-ink/50 pr-4 py-1 whitespace-nowrap w-px align-top">{LABEL.genre[locale]}</td>
+                                    <td className="text-meta py-1">{selected.genre[locale]}</td>
+                                  </tr>
+                                )}
+                              </tbody>
+                            </table>
                           )}
                           <p className="font-serif text-ink text-[15px] leading-relaxed">{selected.impression[locale]}</p>
                         </motion.div>
