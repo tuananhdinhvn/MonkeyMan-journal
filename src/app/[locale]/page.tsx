@@ -7,6 +7,8 @@ import MovieSection from '@/components/MovieSection';
 import JournalSection from '@/components/JournalSection';
 import MyInfoSection from '@/components/MyInfoSection';
 
+export const revalidate = 0;
+
 type Locale = 'vi' | 'en' | 'ko';
 
 /* ─── Copy strings ─────────────────────────────────── */
