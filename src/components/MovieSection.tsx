@@ -260,10 +260,8 @@ export default function MovieSection({ movies, locale, sectionLabel, sectionTitl
                     {LABEL.backList[locale]}
                   </button>
                 )}
-                <h3 className="wl-title text-[23px] font-bold leading-snug">
-                  {selected.title}
-                  <span className="text-meta font-sans text-[13px] font-normal ml-2">({selected.year})</span>
-                </h3>
+                <h3 className="wl-title text-[23px] font-bold leading-snug">{selected.title}</h3>
+                <p className="text-meta font-sans text-[12px] mt-1">{selected.year}</p>
                 <button onClick={closeDetail} className="absolute right-4 top-1/2 -translate-y-1/2 text-meta hover:text-ink transition-colors p-2 rounded-full hover:bg-gray-100">
                   <X size={20} />
                 </button>
