@@ -14,10 +14,22 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: { default: 'MonkeyMan — Travel Journal', template: '%s | MonkeyMan' },
-  description: 'Nhật ký du lịch cá nhân của Tuấn Anh — khám phá Việt Nam qua từng chuyến đi.',
+  title: { default: 'MonkeyMan — Personal Travel Journal from Vietnam', template: '%s | MonkeyMan' },
+  description: 'Personal travel journal by Tuấn Anh — exploring Vietnam through every journey.',
   metadataBase: new URL('https://monkeyman.vn'),
-  // icons handled by src/app/icon.png (App Router convention) and [locale]/layout.tsx
+  openGraph: {
+    type: 'website',
+    url: 'https://monkeyman.vn',
+    siteName: 'MonkeyMan',
+    locale: 'en_US',
+    title: 'MonkeyMan — Personal Travel Journal from Vietnam',
+    description: 'Personal travel journal by Tuấn Anh — exploring Vietnam through every journey.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'MonkeyMan — Personal Travel Journal from Vietnam',
+    description: 'Personal travel journal by Tuấn Anh — exploring Vietnam through every journey.',
+  },
 };
 
 async function getGaId(): Promise<string> {

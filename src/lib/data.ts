@@ -53,6 +53,8 @@ export type Movie = {
   id: string;
   title: string;
   year: number;
+  director: string;
+  cast: string;
   genre: { vi: string; en: string; ko: string };
   rating: number;
   poster: string;
@@ -323,7 +325,9 @@ export const movies: Movie[] = [
     id: '1',
     title: 'The Motorcycle Diaries',
     year: 2004,
-    genre: { vi: 'Chính kịch / Du lịch', en: 'Drama / Travel', ko: '드라마 / 여행' },
+    director: 'Walter Salles',
+    cast: 'Gael García Bernal, Rodrigo de la Serna',
+    genre: { vi: 'Kịch tính, Phiêu lưu', en: 'Drama, Adventure', ko: '드라마, 모험' },
     rating: 9,
     poster: 'https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=400&q=80',
     banner: 'https://images.unsplash.com/photo-1519583272095-6433daf26b6e?w=800&q=80',
@@ -344,7 +348,9 @@ export const movies: Movie[] = [
     id: '2',
     title: 'Into the Wild',
     year: 2007,
-    genre: { vi: 'Phiêu lưu / Tiểu sử', en: 'Adventure / Biography', ko: '모험 / 전기' },
+    director: 'Sean Penn',
+    cast: 'Emile Hirsch, Marcia Gay Harden, William Hurt',
+    genre: { vi: 'Phiêu lưu, Tiểu sử', en: 'Adventure, Biography', ko: '모험, 전기' },
     rating: 9,
     poster: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80',
     banner: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80',
@@ -365,7 +371,9 @@ export const movies: Movie[] = [
     id: '3',
     title: 'Parasite',
     year: 2019,
-    genre: { vi: 'Chính kịch / Kinh dị', en: 'Drama / Thriller', ko: '드라마 / 스릴러' },
+    director: 'Bong Joon-ho',
+    cast: 'Song Kang-ho, Lee Sun-kyun, Cho Yeo-jeong',
+    genre: { vi: 'Kịch tính, Hồi hộp', en: 'Drama, Thriller', ko: '드라마, 스릴러' },
     rating: 10,
     poster: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400&q=80',
     banner: 'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=800&q=80',
@@ -386,7 +394,9 @@ export const movies: Movie[] = [
     id: '4',
     title: 'Past Lives',
     year: 2023,
-    genre: { vi: 'Tình cảm / Chính kịch', en: 'Romance / Drama', ko: '로맨스 / 드라마' },
+    director: 'Celine Song',
+    cast: 'Greta Lee, Teo Yoo, John Magaro',
+    genre: { vi: 'Tình cảm, Kịch tính', en: 'Romance, Drama', ko: '로맨스, 드라마' },
     rating: 9,
     poster: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=400&q=80',
     banner: 'https://images.unsplash.com/photo-1518391846015-55a9cc003b25?w=800&q=80',
@@ -407,7 +417,9 @@ export const movies: Movie[] = [
     id: '5',
     title: 'Lost in Translation',
     year: 2003,
-    genre: { vi: 'Tình cảm / Chính kịch', en: 'Romance / Drama', ko: '로맨스 / 드라마' },
+    director: 'Sofia Coppola',
+    cast: 'Bill Murray, Scarlett Johansson',
+    genre: { vi: 'Tình cảm, Kịch tính', en: 'Romance, Drama', ko: '로맨스, 드라마' },
     rating: 8,
     poster: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&q=80',
     banner: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80',
@@ -428,7 +440,9 @@ export const movies: Movie[] = [
     id: '6',
     title: 'Eat Pray Love',
     year: 2010,
-    genre: { vi: 'Chính kịch / Du lịch', en: 'Drama / Travel', ko: '드라마 / 여행' },
+    director: 'Ryan Murphy',
+    cast: 'Julia Roberts, Javier Bardem, Billy Crudup',
+    genre: { vi: 'Kịch tính, Tình cảm', en: 'Drama, Romance', ko: '드라마, 로맨스' },
     rating: 7,
     poster: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80',
     banner: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&q=80',

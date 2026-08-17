@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { trips as staticTrips, movies as staticMovies, albums as staticAlbums, journalPosts as staticJournalPosts } from '@/lib/data';
 import type { Trip, Movie, Album, JournalPost } from '@/lib/data';
 
 const RichTextEditor = dynamic(() => import('@/components/admin/RichTextEditor'), { ssr: false });
+
+const PW = process.env.NEXT_PUBLIC_ADMIN_PASSWORD ?? 'monkeyman';
 
 /* ─── Storage helpers ─────────────────────────────────────────────────────── */
 
@@ -70,10 +71,31 @@ const BLANK_TRIP: Trip = {
 
 const BLANK_MOVIE: Movie = {
   id: '', title: '', year: new Date().getFullYear(),
+  director: '', cast: '',
   genre: { vi: '', en: '', ko: '' }, rating: 8,
   poster: '', banner: '', trailer: '',
   impression: { vi: '', en: '', ko: '' }, related: [],
 };
+
+const GENRE_OPTIONS: Array<{ vi: string; en: string; ko: string }> = [
+  { vi: 'Hành động',           en: 'Action',      ko: '액션' },
+  { vi: 'Phiêu lưu',           en: 'Adventure',   ko: '모험' },
+  { vi: 'Hoạt hình',           en: 'Animation',   ko: '애니메이션' },
+  { vi: 'Tiểu sử',             en: 'Biography',   ko: '전기' },
+  { vi: 'Hài hước',            en: 'Comedy',      ko: '코미디' },
+  { vi: 'Tội phạm',            en: 'Crime',       ko: '범죄' },
+  { vi: 'Thảm họa',            en: 'Disaster',    ko: '재난' },
+  { vi: 'Kịch tính',           en: 'Drama',       ko: '드라마' },
+  { vi: 'Gia đình',            en: 'Family',      ko: '가족' },
+  { vi: 'Lịch sử',             en: 'Historical',  ko: '역사' },
+  { vi: 'Kinh dị',             en: 'Horror',      ko: '공포' },
+  { vi: 'Pháp lý',             en: 'Legal',       ko: '법정' },
+  { vi: 'Tình cảm',            en: 'Romance',     ko: '로맨스' },
+  { vi: 'Khoa học viễn tưởng', en: 'Sci-Fi',      ko: 'SF' },
+  { vi: 'Thể thao',            en: 'Sports',      ko: '스포츠' },
+  { vi: 'Hồi hộp',             en: 'Thriller',    ko: '스릴러' },
+  { vi: 'Chiến tranh',         en: 'War',         ko: '전쟁' },
+];
 
 const BLANK_ALBUM: Album = {
   id: '',
@@ -168,24 +190,23 @@ function LangRow({ label, values, onChange, multiline = false, rows = 3 }: {
 
 /* ─── Upload helpers ─────────────────────────────────────────────────────── */
 
-// Resize image client-side via canvas → JPEG data URL (no server needed)
-function resizeToDataUrl(file: File, maxPx = 1400, quality = 0.82): Promise<string> {
+// Resize + compress image in browser before uploading — reduces 10MB → ~300KB
+function resizeToBlob(file: File, maxPx = 1600, quality = 0.85): Promise<Blob> {
   return new Promise((resolve, reject) => {
-    const blobUrl = URL.createObjectURL(file);
+    const objectUrl = URL.createObjectURL(file);
     const img = new window.Image();
     img.onload = () => {
-      URL.revokeObjectURL(blobUrl);
+      URL.revokeObjectURL(objectUrl);
       const scale = Math.min(1, maxPx / Math.max(img.width, img.height));
       const w = Math.round(img.width * scale);
       const h = Math.round(img.height * scale);
       const canvas = document.createElement('canvas');
-      canvas.width = w;
-      canvas.height = h;
+      canvas.width = w; canvas.height = h;
       canvas.getContext('2d')!.drawImage(img, 0, 0, w, h);
-      resolve(canvas.toDataURL('image/jpeg', quality));
+      canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('toBlob failed')), 'image/jpeg', quality);
     };
-    img.onerror = () => { URL.revokeObjectURL(blobUrl); reject(new Error('load')); };
-    img.src = blobUrl;
+    img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error('load')); };
+    img.src = objectUrl;
   });
 }
 
@@ -213,10 +234,22 @@ function UploadBtn({ onUploaded, label = '↑ Upload' }: { onUploaded: (url: str
           e.target.value = '';
           setLoading(true);
           try {
-            const dataUrl = await resizeToDataUrl(file);
-            onUploaded(dataUrl);
-          } catch {
-            alert('Không thể đọc ảnh — thử lại');
+            const blob = await resizeToBlob(file);
+            const jpegFile = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' });
+            const fd = new FormData();
+            fd.append('file', jpegFile);
+            const res = await fetch('/api/sanity/upload', {
+              method: 'POST',
+              headers: { 'x-admin-password': PW },
+              body: fd,
+            });
+            const data = await res.json();
+            if (data.url) onUploaded(data.url);
+            else alert('Upload thất bại: ' + (data.error ?? 'Lỗi không xác định'));
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : '';
+            if (msg === 'load') alert('Không đọc được ảnh — thử chuyển sang JPG/PNG trước.');
+            else alert('Lỗi upload ảnh: ' + (msg || 'Lỗi không xác định'));
           }
           setLoading(false);
         }}
@@ -284,11 +317,12 @@ function GalleryInput({ images, onChange }: {
 
 /* ─── Albums section ─────────────────────────────────────────────────────── */
 
-function AlbumForm({ album, isNew, onChange, onSave, onCancel }: {
+function AlbumForm({ album, isNew, onChange, onSave, onCancel, saving }: {
   album: Album; isNew: boolean;
   onChange: (a: Album) => void;
   onSave: () => void;
   onCancel: () => void;
+  saving?: boolean;
 }) {
   const set = <Kk extends keyof Album>(field: Kk, val: Album[Kk]) => onChange({ ...album, [field]: val });
   const setLang = (field: 'name' | 'description', lang: 'vi' | 'en' | 'ko', val: string) =>
@@ -379,7 +413,7 @@ function AlbumForm({ album, isNew, onChange, onSave, onCancel }: {
       </div>
 
       <div className="flex gap-3 mt-8 pt-6 border-t border-gray-100">
-        <Btn onClick={onSave}>Lưu</Btn>
+        <Btn onClick={onSave} disabled={saving}>{saving ? 'Đang lưu...' : 'Lưu'}</Btn>
         <Btn variant="secondary" onClick={onCancel}>Huỷ</Btn>
       </div>
     </div>
@@ -387,29 +421,45 @@ function AlbumForm({ album, isNew, onChange, onSave, onCancel }: {
 }
 
 function AlbumsSection({ onSaved }: { onSaved: () => void }) {
-  const [albums, setAlbums]     = useState<Album[]>(staticAlbums);
+  const [albums, setAlbums]     = useState<Album[]>([]);
   const [editing, setEditing]   = useState<Album | null>(null);
   const [isNew, setIsNew]       = useState(false);
+  const [loading, setLoading]   = useState(true);
+  const [saving, setSaving]     = useState(false);
 
-  useEffect(() => setAlbums(rd(K.albums, staticAlbums)), []);
-
-  const commit = (updated: Album[]) => { wr(K.albums, updated); setAlbums(updated); onSaved(); };
+  useEffect(() => {
+    fetch('/api/sanity/albums', { headers: { 'x-admin-password': PW } })
+      .then(r => r.json()).then(setAlbums).catch(() => {}).finally(() => setLoading(false));
+  }, []);
 
   const startEdit = (a: Album) => { setEditing({ ...a }); setIsNew(false); };
-  const startNew  = () => { setEditing({ ...BLANK_ALBUM, id: `album-${Date.now()}` }); setIsNew(true); };
+  const startNew  = () => { setEditing({ ...BLANK_ALBUM, id: '' }); setIsNew(true); };
 
-  const saveEdit = () => {
-    if (!editing) return;
-    commit(isNew ? [...albums, editing] : albums.map(a => a.id === editing.id ? editing : a));
-    setEditing(null);
+  const saveEdit = async () => {
+    if (!editing || saving) return;
+    setSaving(true);
+    try {
+      const res = await fetch(
+        isNew ? '/api/sanity/albums' : `/api/sanity/albums/${editing.id}`,
+        { method: isNew ? 'POST' : 'PATCH', headers: { 'Content-Type': 'application/json', 'x-admin-password': PW }, body: JSON.stringify(editing) }
+      );
+      const data = await res.json();
+      if (isNew) setAlbums(prev => [...prev, { ...editing, id: data.id }]);
+      else setAlbums(prev => prev.map(a => a.id === editing.id ? editing : a));
+      setEditing(null);
+      onSaved();
+    } catch { alert('Lưu thất bại'); }
+    finally { setSaving(false); }
   };
 
-  const del = (id: string) => {
+  const del = async (id: string) => {
     if (!confirm('Xoá album này?')) return;
-    commit(albums.filter(a => a.id !== id));
+    await fetch(`/api/sanity/albums/${id}`, { method: 'DELETE', headers: { 'x-admin-password': PW } });
+    setAlbums(prev => prev.filter(a => a.id !== id));
+    onSaved();
   };
 
-  if (editing) return <AlbumForm album={editing} isNew={isNew} onChange={setEditing} onSave={saveEdit} onCancel={() => setEditing(null)} />;
+  if (editing) return <AlbumForm album={editing} isNew={isNew} onChange={setEditing} onSave={saveEdit} onCancel={() => setEditing(null)} saving={saving} />;
 
   return (
     <div>
@@ -420,6 +470,7 @@ function AlbumsSection({ onSaved }: { onSaved: () => void }) {
         </div>
         <Btn onClick={startNew}>+ Thêm album</Btn>
       </div>
+      {loading && <p className="text-sm text-gray-400">Đang tải...</p>}
 
       <div className="space-y-2">
         {albums.map((a) => (
@@ -430,7 +481,7 @@ function AlbumsSection({ onSaved }: { onSaved: () => void }) {
                 <img src={a.coverImage} alt="" className="w-12 h-8 object-cover rounded shrink-0" />
               )}
               <div className="min-w-0">
-                <p className="font-medium text-gray-800 text-sm truncate">{a.name.vi || a.id}</p>
+                <p className="font-medium text-gray-800 text-sm truncate">{a.name.en || a.name.vi || a.name.ko || a.id}</p>
                 <p className="text-xs text-gray-400">{a.location} · {a.date} · {a.photos.length} ảnh</p>
               </div>
             </div>
@@ -448,11 +499,12 @@ function AlbumsSection({ onSaved }: { onSaved: () => void }) {
 
 /* ─── Journal admin section ───────────────────────────────────────────────── */
 
-function JournalPostForm({ post, isNew, onChange, onSave, onCancel }: {
+function JournalPostForm({ post, isNew, onChange, onSave, onCancel, saving }: {
   post: JournalPost; isNew: boolean;
   onChange: (p: JournalPost) => void;
   onSave: () => void;
   onCancel: () => void;
+  saving?: boolean;
 }) {
   const [contentTab, setContentTab] = useState<'vi' | 'en' | 'ko'>('vi');
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -472,8 +524,13 @@ function JournalPostForm({ post, isNew, onChange, onSave, onCancel }: {
         input.value = '';
         if (!file) { resolve(null); return; }
         try {
-          const url = await resizeToDataUrl(file);
-          resolve(url);
+          const blob = await resizeToBlob(file);
+          const jpegFile = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' });
+          const fd = new FormData();
+          fd.append('file', jpegFile);
+          const res = await fetch('/api/sanity/upload', { method: 'POST', headers: { 'x-admin-password': PW }, body: fd });
+          const data = await res.json();
+          resolve(data.url ?? null);
         } catch {
           resolve(null);
         }
@@ -550,7 +607,7 @@ function JournalPostForm({ post, isNew, onChange, onSave, onCancel }: {
       </div>
 
       <div className="flex gap-3 mt-8 pt-6 border-t border-gray-100">
-        <Btn onClick={onSave}>Lưu</Btn>
+        <Btn onClick={onSave} disabled={saving}>{saving ? 'Đang lưu...' : 'Lưu'}</Btn>
         <Btn variant="secondary" onClick={onCancel}>Huỷ</Btn>
       </div>
     </div>
@@ -558,29 +615,45 @@ function JournalPostForm({ post, isNew, onChange, onSave, onCancel }: {
 }
 
 function JournalAdminSection({ onSaved }: { onSaved: () => void }) {
-  const [posts, setPosts]       = useState<JournalPost[]>(staticJournalPosts);
+  const [posts, setPosts]       = useState<JournalPost[]>([]);
   const [editing, setEditing]   = useState<JournalPost | null>(null);
   const [isNew, setIsNew]       = useState(false);
+  const [loading, setLoading]   = useState(true);
+  const [saving, setSaving]     = useState(false);
 
-  useEffect(() => setPosts(rd(K.journal, staticJournalPosts)), []);
-
-  const commit = (updated: JournalPost[]) => { wr(K.journal, updated); setPosts(updated); onSaved(); };
+  useEffect(() => {
+    fetch('/api/sanity/journal', { headers: { 'x-admin-password': PW } })
+      .then(r => r.json()).then(setPosts).catch(() => {}).finally(() => setLoading(false));
+  }, []);
 
   const startEdit = (p: JournalPost) => { setEditing({ ...p }); setIsNew(false); };
-  const startNew  = () => { setEditing({ ...BLANK_POST, id: `post-${Date.now()}` }); setIsNew(true); };
+  const startNew  = () => { setEditing({ ...BLANK_POST, id: '' }); setIsNew(true); };
 
-  const saveEdit = () => {
-    if (!editing) return;
-    commit(isNew ? [...posts, editing] : posts.map(p => p.id === editing.id ? editing : p));
-    setEditing(null);
+  const saveEdit = async () => {
+    if (!editing || saving) return;
+    setSaving(true);
+    try {
+      const res = await fetch(
+        isNew ? '/api/sanity/journal' : `/api/sanity/journal/${editing.id}`,
+        { method: isNew ? 'POST' : 'PATCH', headers: { 'Content-Type': 'application/json', 'x-admin-password': PW }, body: JSON.stringify(editing) }
+      );
+      const data = await res.json();
+      if (isNew) setPosts(prev => [...prev, { ...editing, id: data.id }]);
+      else setPosts(prev => prev.map(p => p.id === editing.id ? editing : p));
+      setEditing(null);
+      onSaved();
+    } catch { alert('Lưu thất bại'); }
+    finally { setSaving(false); }
   };
 
-  const del = (id: string) => {
+  const del = async (id: string) => {
     if (!confirm('Xoá bài viết này?')) return;
-    commit(posts.filter(p => p.id !== id));
+    await fetch(`/api/sanity/journal/${id}`, { method: 'DELETE', headers: { 'x-admin-password': PW } });
+    setPosts(prev => prev.filter(p => p.id !== id));
+    onSaved();
   };
 
-  if (editing) return <JournalPostForm post={editing} isNew={isNew} onChange={setEditing} onSave={saveEdit} onCancel={() => setEditing(null)} />;
+  if (editing) return <JournalPostForm post={editing} isNew={isNew} onChange={setEditing} onSave={saveEdit} onCancel={() => setEditing(null)} saving={saving} />;
 
   return (
     <div>
@@ -591,6 +664,7 @@ function JournalAdminSection({ onSaved }: { onSaved: () => void }) {
         </div>
         <Btn onClick={startNew}>+ Thêm bài viết</Btn>
       </div>
+      {loading && <p className="text-sm text-gray-400">Đang tải...</p>}
 
       <div className="space-y-2">
         {posts.map((p) => (
@@ -601,7 +675,7 @@ function JournalAdminSection({ onSaved }: { onSaved: () => void }) {
                 <img src={p.coverImage} alt="" className="w-12 h-8 object-cover rounded shrink-0" />
               )}
               <div className="min-w-0">
-                <p className="font-medium text-gray-800 text-sm truncate">{p.title.vi || p.id}</p>
+                <p className="font-medium text-gray-800 text-sm truncate">{p.title.en || p.title.vi || p.title.ko || p.id}</p>
                 <p className="text-xs text-gray-400">{p.location} · {p.date}</p>
               </div>
             </div>
@@ -619,9 +693,27 @@ function JournalAdminSection({ onSaved }: { onSaved: () => void }) {
 
 /* ─── Video section ───────────────────────────────────────────────────────── */
 
+const DEFAULT_VIDEO_URL = 'https://www.youtube.com/watch?v=NSnkb1IAjbE';
+
 function VideoSection({ onSaved }: { onSaved: () => void }) {
   const [url, setUrl] = useState('');
-  useEffect(() => setUrl(rd(K.video, 'https://www.youtube.com/watch?v=NSnkb1IAjbE')), []);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/sanity/video', { headers: { 'x-admin-password': PW } })
+      .then(r => r.json())
+      .then(data => setUrl(data.url || DEFAULT_VIDEO_URL))
+      .catch(() => setUrl(DEFAULT_VIDEO_URL));
+  }, []);
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await fetch('/api/sanity/video', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-admin-password': PW }, body: JSON.stringify({ url }) });
+      onSaved();
+    } catch { alert('Lưu thất bại'); }
+    finally { setSaving(false); }
+  };
 
   return (
     <div>
@@ -640,7 +732,7 @@ function VideoSection({ onSaved }: { onSaved: () => void }) {
         )}
       </div>
       <div className="mt-6">
-        <Btn onClick={() => { wr(K.video, url); onSaved(); }}>Lưu thay đổi</Btn>
+        <Btn onClick={save} disabled={saving}>{saving ? 'Đang lưu...' : 'Lưu thay đổi'}</Btn>
       </div>
     </div>
   );
@@ -650,10 +742,24 @@ function VideoSection({ onSaved }: { onSaved: () => void }) {
 
 function InfoSection({ onSaved }: { onSaved: () => void }) {
   const [info, setInfo] = useState<MyInfo>(DEF_INFO);
-  useEffect(() => setInfo(rd(K.info, DEF_INFO)), []);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/sanity/info', { headers: { 'x-admin-password': PW } })
+      .then(r => r.json()).then(data => { if (data) setInfo(data); }).catch(() => {});
+  }, []);
 
   const setLang = (field: 'title' | 'text', lang: 'vi' | 'en' | 'ko', val: string) =>
     setInfo(p => ({ ...p, [field]: { ...p[field], [lang]: val } }));
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await fetch('/api/sanity/info', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-admin-password': PW }, body: JSON.stringify(info) });
+      onSaved();
+    } catch { alert('Lưu thất bại'); }
+    finally { setSaving(false); }
+  };
 
   return (
     <div>
@@ -669,7 +775,7 @@ function InfoSection({ onSaved }: { onSaved: () => void }) {
         <LangRow label="Mô tả ngắn" values={info.text} onChange={(l, v) => setLang('text', l, v)} multiline rows={3} />
       </div>
       <div className="mt-6">
-        <Btn onClick={() => { wr(K.info, info); onSaved(); }}>Lưu thay đổi</Btn>
+        <Btn onClick={save} disabled={saving}>{saving ? 'Đang lưu...' : 'Lưu thay đổi'}</Btn>
       </div>
     </div>
   );
@@ -747,11 +853,11 @@ function TripForm({ trip, isNew, onChange, onSave, onCancel }: {
 /* ─── Trips section ───────────────────────────────────────────────────────── */
 
 function TripsSection({ onSaved }: { onSaved: () => void }) {
-  const [trips, setTrips]   = useState<Trip[]>(staticTrips);
+  const [trips, setTrips]   = useState<Trip[]>([]);
   const [editing, setEditing] = useState<Trip | null>(null);
   const [isNew, setIsNew]   = useState(false);
 
-  useEffect(() => setTrips(rd(K.trips, staticTrips)), []);
+  useEffect(() => setTrips(rd(K.trips, [])), []);
 
   const commit = (updated: Trip[]) => { wr(K.trips, updated); setTrips(updated); onSaved(); };
 
@@ -806,13 +912,84 @@ function TripsSection({ onSaved }: { onSaved: () => void }) {
   );
 }
 
+/* ─── Genre multi-select dropdown ────────────────────────────────────────── */
+
+function GenreSelect({ value, onChange }: {
+  value: Movie['genre'];
+  onChange: (g: Movie['genre']) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const selected = GENRE_OPTIONS.filter(g => value.vi.split(',').map(s => s.trim()).includes(g.vi));
+
+  const toggle = (g: (typeof GENRE_OPTIONS)[0]) => {
+    const next = selected.some(s => s.vi === g.vi)
+      ? selected.filter(s => s.vi !== g.vi)
+      : [...selected, g];
+    onChange({
+      vi: next.map(s => s.vi).join(', '),
+      en: next.map(s => s.en).join(', '),
+      ko: next.map(s => s.ko).join(', '),
+    });
+  };
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        className="w-full text-left border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-sage/30 transition-colors"
+      >
+        {selected.length === 0 ? (
+          <span className="text-gray-400">Chọn thể loại...</span>
+        ) : (
+          <span className="text-gray-700">{selected.map(g => g.vi).join(', ')}</span>
+        )}
+        <span className="float-right text-gray-400 mt-0.5">▾</span>
+      </button>
+      {open && (
+        <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-56 overflow-y-auto">
+          {GENRE_OPTIONS.map(g => {
+            const checked = selected.some(s => s.vi === g.vi);
+            return (
+              <label key={g.vi} className="flex items-center gap-2.5 px-3 py-2 hover:bg-gray-50 cursor-pointer text-sm">
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  onChange={() => toggle(g)}
+                  className="accent-sage w-3.5 h-3.5 shrink-0"
+                />
+                <span className="text-gray-700">{g.vi}</span>
+                <span className="text-gray-400 text-xs ml-auto">{g.en}</span>
+              </label>
+            );
+          })}
+        </div>
+      )}
+      {selected.length > 0 && (
+        <p className="text-[11px] text-gray-400 mt-1">EN: {value.en} · KO: {value.ko}</p>
+      )}
+    </div>
+  );
+}
+
 /* ─── Movie form ──────────────────────────────────────────────────────────── */
 
-function MovieForm({ movie, isNew, onChange, onSave, onCancel }: {
+function MovieForm({ movie, isNew, onChange, onSave, onCancel, saving }: {
   movie: Movie; isNew: boolean;
   onChange: (m: Movie) => void;
   onSave: () => void;
   onCancel: () => void;
+  saving?: boolean;
 }) {
   const set = <K extends keyof Movie>(field: K, val: Movie[K]) => onChange({ ...movie, [field]: val });
   const setLang = (field: 'genre' | 'impression', lang: 'vi' | 'en' | 'ko', val: string) =>
@@ -859,6 +1036,19 @@ function MovieForm({ movie, isNew, onChange, onSave, onCancel }: {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
+          <Field label="Đạo diễn">
+            <Inp value={movie.director} onChange={e => set('director', e.target.value)} placeholder="Steven Spielberg" />
+          </Field>
+          <Field label="Diễn viên chính" hint="Phân cách bằng dấu phẩy">
+            <Inp value={movie.cast} onChange={e => set('cast', e.target.value)} placeholder="Tom Hanks, Ben Kingsley" />
+          </Field>
+        </div>
+
+        <Field label="Thể loại">
+          <GenreSelect value={movie.genre} onChange={g => set('genre', g)} />
+        </Field>
+
+        <div className="grid grid-cols-2 gap-4">
           <ImageInput label="Ảnh bìa ngang (banner)" hint="Kích thước tối ưu: 1280 × 720 px (tỉ lệ 16:9). Hệ thống tự nén ảnh khi upload."
             value={movie.banner} onChange={url => set('banner', url)} />
           <Field label="Link trailer YouTube">
@@ -866,7 +1056,6 @@ function MovieForm({ movie, isNew, onChange, onSave, onCancel }: {
           </Field>
         </div>
 
-        <LangRow label="Thể loại" values={movie.genre} onChange={(l, v) => setLang('genre', l, v)} />
         <LangRow label="Cảm nhận phim" values={movie.impression} onChange={(l, v) => setLang('impression', l, v)} multiline rows={4} />
 
         {/* Related images */}
@@ -912,7 +1101,7 @@ function MovieForm({ movie, isNew, onChange, onSave, onCancel }: {
       </div>
 
       <div className="flex gap-3 mt-8 pt-6 border-t border-gray-100">
-        <Btn onClick={onSave}>Lưu</Btn>
+        <Btn onClick={onSave} disabled={saving}>{saving ? 'Đang lưu...' : 'Lưu'}</Btn>
         <Btn variant="secondary" onClick={onCancel}>Huỷ</Btn>
       </div>
     </div>
@@ -922,32 +1111,45 @@ function MovieForm({ movie, isNew, onChange, onSave, onCancel }: {
 /* ─── Movies section ──────────────────────────────────────────────────────── */
 
 function MoviesSection({ onSaved }: { onSaved: () => void }) {
-  const [movies, setMovies]   = useState<Movie[]>(staticMovies);
+  const [movies, setMovies]   = useState<Movie[]>([]);
   const [editing, setEditing] = useState<Movie | null>(null);
   const [isNew, setIsNew]     = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving]   = useState(false);
 
-  useEffect(() => setMovies(rd(K.movies, staticMovies)), []);
-
-  const commit = (updated: Movie[]) => { wr(K.movies, updated); setMovies(updated); onSaved(); };
+  useEffect(() => {
+    fetch('/api/sanity/movies', { headers: { 'x-admin-password': PW } })
+      .then(r => r.json()).then(setMovies).catch(() => {}).finally(() => setLoading(false));
+  }, []);
 
   const startEdit = (m: Movie) => { setEditing({ ...m }); setIsNew(false); };
-  const startNew  = () => {
-    setEditing({ ...BLANK_MOVIE, id: Date.now().toString() });
-    setIsNew(true);
+  const startNew  = () => { setEditing({ ...BLANK_MOVIE, id: '' }); setIsNew(true); };
+
+  const saveEdit = async () => {
+    if (!editing || saving) return;
+    setSaving(true);
+    try {
+      const res = await fetch(
+        isNew ? '/api/sanity/movies' : `/api/sanity/movies/${editing.id}`,
+        { method: isNew ? 'POST' : 'PATCH', headers: { 'Content-Type': 'application/json', 'x-admin-password': PW }, body: JSON.stringify(editing) }
+      );
+      const data = await res.json();
+      if (isNew) setMovies(prev => [...prev, { ...editing, id: data.id }]);
+      else setMovies(prev => prev.map(m => m.id === editing.id ? editing : m));
+      setEditing(null);
+      onSaved();
+    } catch { alert('Lưu thất bại'); }
+    finally { setSaving(false); }
   };
 
-  const saveEdit = () => {
-    if (!editing) return;
-    commit(isNew ? [...movies, editing] : movies.map(m => m.id === editing.id ? editing : m));
-    setEditing(null);
-  };
-
-  const del = (id: string) => {
+  const del = async (id: string) => {
     if (!confirm('Xoá phim này?')) return;
-    commit(movies.filter(m => m.id !== id));
+    await fetch(`/api/sanity/movies/${id}`, { method: 'DELETE', headers: { 'x-admin-password': PW } });
+    setMovies(prev => prev.filter(m => m.id !== id));
+    onSaved();
   };
 
-  if (editing) return <MovieForm movie={editing} isNew={isNew} onChange={setEditing} onSave={saveEdit} onCancel={() => setEditing(null)} />;
+  if (editing) return <MovieForm movie={editing} isNew={isNew} onChange={setEditing} onSave={saveEdit} onCancel={() => setEditing(null)} saving={saving} />;
 
   return (
     <div>
@@ -959,6 +1161,7 @@ function MoviesSection({ onSaved }: { onSaved: () => void }) {
         <Btn onClick={startNew}>+ Thêm phim</Btn>
       </div>
 
+      {loading && <p className="text-sm text-gray-400">Đang tải...</p>}
       <div className="space-y-2">
         {movies.map((m) => (
           <div key={m.id} className="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-4 py-3">
@@ -969,6 +1172,7 @@ function MoviesSection({ onSaved }: { onSaved: () => void }) {
               )}
               <div className="min-w-0">
                 <p className="font-medium text-gray-800 text-sm truncate">{m.title} <span className="text-gray-400 font-normal">({m.year})</span></p>
+                <p className="text-xs text-gray-500 truncate">{[m.director, m.genre.en].filter(Boolean).join(' · ')}</p>
                 <div className="flex items-center gap-1 mt-0.5">
                   {Array.from({ length: 10 }).map((_, i) => (
                     <span key={i} className={`text-[10px] ${i < m.rating ? 'text-yellow-400' : 'text-gray-200'}`}>★</span>
@@ -1229,8 +1433,6 @@ const SECTIONS: { id: Section; label: string; icon: string }[] = [
   { id: 'movies',    label: 'My Movies',         icon: '🎥' },
   { id: 'contacts',  label: 'Call Me',           icon: '📞' },
 ];
-
-const PW = process.env.NEXT_PUBLIC_ADMIN_PASSWORD ?? 'monkeyman';
 
 export default function AdminPage() {
   const [authed, setAuthed]   = useState(false);

@@ -4,6 +4,22 @@ import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { trips } from '@/lib/data';
 import { MapPin, Clock } from 'lucide-react';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Travel Journal',
+  description: 'Explore Vietnam and beyond through my personal travel diary — every trip, every memory.',
+  openGraph: {
+    title: 'Travel Journal | MonkeyMan',
+    description: 'Explore Vietnam and beyond through my personal travel diary — every trip, every memory.',
+    url: 'https://monkeyman.vn/travels',
+  },
+  twitter: {
+    title: 'Travel Journal | MonkeyMan',
+    description: 'Explore Vietnam and beyond through my personal travel diary — every trip, every memory.',
+  },
+  alternates: { canonical: 'https://monkeyman.vn/travels' },
+};
 
 export default async function TravelsPage() {
   const locale = (await getLocale()) as 'vi' | 'en' | 'ko';

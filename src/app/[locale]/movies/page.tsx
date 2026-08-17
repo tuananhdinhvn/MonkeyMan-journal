@@ -1,15 +1,33 @@
 import { useTranslations } from 'next-intl';
 import { getLocale } from 'next-intl/server';
 import Image from 'next/image';
-import { movies } from '@/lib/data';
+import { fetchMovies } from '@/sanity/queries';
+import type { Movie } from '@/lib/data';
 import { Star } from 'lucide-react';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Movie Collection',
+  description: 'Movies I love — especially those based on true stories. My personal film diary.',
+  openGraph: {
+    title: 'Movie Collection | MonkeyMan',
+    description: 'Movies I love — especially those based on true stories. My personal film diary.',
+    url: 'https://monkeyman.vn/movies',
+  },
+  twitter: {
+    title: 'Movie Collection | MonkeyMan',
+    description: 'Movies I love — especially those based on true stories. My personal film diary.',
+  },
+  alternates: { canonical: 'https://monkeyman.vn/movies' },
+};
 
 export default async function MoviesPage() {
   const locale = (await getLocale()) as 'vi' | 'en' | 'ko';
-  return <MoviesContent locale={locale} />;
+  const movies = await fetchMovies();
+  return <MoviesContent locale={locale} movies={movies} />;
 }
 
-function MoviesContent({ locale }: { locale: 'vi' | 'en' | 'ko' }) {
+function MoviesContent({ locale, movies }: { locale: 'vi' | 'en' | 'ko'; movies: Movie[] }) {
   const t = useTranslations('movies');
 
   return (
@@ -43,11 +61,16 @@ function MoviesContent({ locale }: { locale: 'vi' | 'en' | 'ko' }) {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-4">
                   <h2 className="text-white font-bold text-lg leading-tight">{movie.title}</h2>
-                  <div className="flex items-center gap-2 mt-1">
+                  <div className="flex items-center gap-2 mt-1 flex-wrap">
                     <span className="text-slate-300 text-xs">{movie.year}</span>
-                    <span className="text-slate-500 text-xs">·</span>
-                    <span className="text-slate-300 text-xs">{movie.genre[locale]}</span>
+                    {movie.genre[locale] && <>
+                      <span className="text-slate-500 text-xs">·</span>
+                      <span className="text-slate-300 text-xs">{movie.genre[locale]}</span>
+                    </>}
                   </div>
+                  {movie.director && (
+                    <p className="text-slate-400 text-xs mt-0.5">Dir. {movie.director}</p>
+                  )}
                 </div>
               </div>
 
@@ -65,6 +88,11 @@ function MoviesContent({ locale }: { locale: 'vi' | 'en' | 'ko' }) {
                   </span>
                 </div>
 
+                {movie.cast && (
+                  <p className="text-slate-500 text-xs mb-3">
+                    <span className="font-semibold text-slate-600">Cast: </span>{movie.cast}
+                  </p>
+                )}
                 <p className="text-slate-600 text-sm leading-relaxed">
                   {movie.impression[locale]}
                 </p>

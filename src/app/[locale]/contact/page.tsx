@@ -2,6 +2,22 @@ import { useTranslations } from 'next-intl';
 import { getLocale } from 'next-intl/server';
 import { Mail, Phone, MessageCircle, MapPin } from 'lucide-react';
 import ContactForm from '@/components/ContactForm';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Contact',
+  description: 'Get in touch with MonkeyMan — travel questions, collaboration, or just say hello.',
+  openGraph: {
+    title: 'Contact | MonkeyMan',
+    description: 'Get in touch with MonkeyMan — travel questions, collaboration, or just say hello.',
+    url: 'https://monkeyman.vn/contact',
+  },
+  twitter: {
+    title: 'Contact | MonkeyMan',
+    description: 'Get in touch with MonkeyMan — travel questions, collaboration, or just say hello.',
+  },
+  alternates: { canonical: 'https://monkeyman.vn/contact' },
+};
 
 export default async function ContactPage() {
   const locale = (await getLocale()) as 'vi' | 'en' | 'ko';

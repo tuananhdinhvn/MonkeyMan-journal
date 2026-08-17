@@ -1,4 +1,4 @@
-import { movies, albums, journalPosts } from '@/lib/data';
+import { fetchAlbums, fetchJournalPosts, fetchMovies, fetchMyInfo, fetchVideoUrl } from '@/sanity/queries';
 import AnimateSection from '@/components/AnimateSection';
 // import HeroSlider from '@/components/HeroSlider';
 import DestinationSlider from '@/components/DestinationSlider';
@@ -99,13 +99,21 @@ export default async function HomePage({
   const locale = (rawLocale as Locale) || 'vi';
   const c = copy[locale];
 
+  const [albums, journalPosts, movies, myInfo, videoUrl] = await Promise.all([
+    fetchAlbums(),
+    fetchJournalPosts(),
+    fetchMovies(),
+    fetchMyInfo(),
+    fetchVideoUrl(),
+  ]);
+
   return (
     <div className="overflow-x-hidden">
 
       {/* ══════════════════════════════════════════════
           0. FULL-SCREEN VIDEO INTRO
       ══════════════════════════════════════════════ */}
-      <HomeVideoHero />
+      <HomeVideoHero initialUrl={videoUrl ?? undefined} />
 
       {/* ══════════════════════════════════════════════
           3. personal intro
@@ -113,7 +121,7 @@ export default async function HomePage({
       <section id="my-info" className="bg-cream py-[50px]">
         <div className="mx-auto max-w-8xl px-6 sm:px-10">
           <AnimateSection>
-            <MyInfoSection locale={locale} />
+            <MyInfoSection locale={locale} initial={myInfo ?? undefined} />
           </AnimateSection>
         </div>
       </section>

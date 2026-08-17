@@ -16,29 +16,13 @@ function buildEmbedUrl(youtubeUrl: string): string {
   );
 }
 
-export default function HomeVideoHero() {
-  const [videoUrl, setVideoUrl] = useState(DEFAULT_VIDEO);
+export default function HomeVideoHero({ initialUrl }: { initialUrl?: string }) {
+  // initialUrl comes from Sanity (server-side). DEFAULT_VIDEO is last-resort fallback.
+  const [videoUrl, setVideoUrl] = useState(initialUrl || DEFAULT_VIDEO);
 
   useEffect(() => {
-    const load = () => {
-      try {
-        const stored = localStorage.getItem('admin:video');
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          setVideoUrl(typeof parsed === 'string' && parsed ? parsed : DEFAULT_VIDEO);
-        } else {
-          setVideoUrl(DEFAULT_VIDEO);
-        }
-      } catch {}
-    };
-    load();
-    window.addEventListener('storage', load);
-    window.addEventListener('focus', load);
-    return () => {
-      window.removeEventListener('storage', load);
-      window.removeEventListener('focus', load);
-    };
-  }, []);
+    setVideoUrl(initialUrl || DEFAULT_VIDEO);
+  }, [initialUrl]);
 
   const embedUrl = buildEmbedUrl(videoUrl);
 

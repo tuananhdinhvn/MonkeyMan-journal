@@ -5,9 +5,44 @@ import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { trips } from '@/lib/data';
 import { MapPin, Clock, Calendar, Star } from 'lucide-react';
+import type { Metadata } from 'next';
 
 export async function generateStaticParams() {
   return trips.map((trip) => ({ slug: trip.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const trip = trips.find((t) => t.slug === slug);
+  if (!trip) return {};
+
+  const title = trip.title.en;
+  const description = trip.summary.en;
+  const image = trip.coverImage;
+  const url = `https://monkeyman.vn/travels/${slug}`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title: `${title} | MonkeyMan`,
+      description,
+      url,
+      type: 'article',
+      images: [{ url: image, width: 1200, height: 630, alt: title }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${title} | MonkeyMan`,
+      description,
+      images: [image],
+    },
+  };
 }
 
 export default async function TripDetailPage({

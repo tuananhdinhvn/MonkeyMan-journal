@@ -3,6 +3,22 @@ import { getLocale } from 'next-intl/server';
 import Image from 'next/image';
 import { experiences } from '@/lib/data';
 import { Star } from 'lucide-react';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Experiences',
+  description: 'Stories and impressions from people who have explored Vietnam with me.',
+  openGraph: {
+    title: 'Experiences | MonkeyMan',
+    description: 'Stories and impressions from people who have explored Vietnam with me.',
+    url: 'https://monkeyman.vn/experiences',
+  },
+  twitter: {
+    title: 'Experiences | MonkeyMan',
+    description: 'Stories and impressions from people who have explored Vietnam with me.',
+  },
+  alternates: { canonical: 'https://monkeyman.vn/experiences' },
+};
 
 export default async function ExperiencesPage() {
   const locale = (await getLocale()) as 'vi' | 'en' | 'ko';

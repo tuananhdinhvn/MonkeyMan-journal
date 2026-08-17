@@ -24,14 +24,14 @@ const DEFAULT: MyInfo = {
   },
 };
 
-export default function MyInfoSection({ locale }: { locale: Locale }) {
-  const [info, setInfo] = useState<MyInfo>(DEFAULT);
+export default function MyInfoSection({ locale, initial }: { locale: Locale; initial?: MyInfo }) {
+  const [info, setInfo] = useState<MyInfo>(initial ?? DEFAULT);
 
   useEffect(() => {
     const load = () => {
       try {
         const stored = localStorage.getItem('admin:info');
-        setInfo(stored ? JSON.parse(stored) : DEFAULT);
+        setInfo(stored ? JSON.parse(stored) : (initial ?? DEFAULT));
       } catch {}
     };
     load();
@@ -41,7 +41,7 @@ export default function MyInfoSection({ locale }: { locale: Locale }) {
       window.removeEventListener('storage', load);
       window.removeEventListener('focus', load);
     };
-  }, []);
+  }, [initial]);
 
   return (
     <div className="flex flex-col md:flex-row items-center gap-0">

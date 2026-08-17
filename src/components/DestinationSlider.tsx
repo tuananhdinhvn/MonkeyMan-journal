@@ -14,34 +14,10 @@ interface Props {
 const ALBUM_LABEL = { vi: 'Xem Album', en: 'View Album', ko: '앨범 보기' };
 const AUTO_INTERVAL = 5000;
 
-export default function DestinationSlider({ albums: propAlbums, locale }: Props) {
+export default function DestinationSlider({ albums, locale }: Props) {
   const [active, setActive] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIdx, setLightboxIdx] = useState(0);
-  const [lsAlbums, setLsAlbums] = useState<Album[] | null>(null);
-
-  useEffect(() => {
-    const load = () => {
-      try {
-        const stored = localStorage.getItem('admin:albums');
-        if (stored) {
-          const all: Album[] = JSON.parse(stored);
-          setLsAlbums(all.slice(0, Math.min(all.length, 6)));
-        } else {
-          setLsAlbums(null);
-        }
-      } catch {}
-    };
-    load();
-    window.addEventListener('storage', load);
-    window.addEventListener('focus', load);
-    return () => {
-      window.removeEventListener('storage', load);
-      window.removeEventListener('focus', load);
-    };
-  }, []);
-
-  const albums = (lsAlbums && lsAlbums.length > 0) ? lsAlbums : (lsAlbums === null ? propAlbums : []);
 
   const goNext = useCallback(
     () => setActive((a) => (a + 1) % Math.max(albums.length, 1)),

@@ -1,82 +1,106 @@
 import { client } from './client'
 import type { Album, JournalPost, Movie } from '@/lib/data'
 
-// ─── Image projection helper ────────────────────────────────────────────────
-// Returns a CDN URL with width optimisation from a Sanity image reference.
-const imgUrl = (field: string, w = 1400) =>
-  `"${field}": ${field}.asset->url + "?w=${w}&auto=format&fit=max"`
-
 // ─── Albums ─────────────────────────────────────────────────────────────────
 export async function fetchAlbums(): Promise<Album[]> {
-  const query = `*[_type == "album"] | order(coalesce(order, 999), date desc) {
-    "id": _id,
-    name, description, location, date,
-    ${imgUrl('coverImage')},
-    "photos": photos[] {
-      ${imgUrl('image', 1400).replace('"image"', '"photo"').replace('image.asset', 'photo.asset')},
-      caption
-    }
-  }`
-  // photos projection needs special handling
-  const albumsRaw = await client.fetch<RawAlbum[]>(`
+  const raw = await client.fetch<Array<{
+    id: string
+    name: Album['name']
+    description: Album['description']
+    coverImage: string | null
+    location: string
+    date: string
+    photos: Array<{ image: string | null; caption: Album['photos'][0]['caption'] }> | null
+  }>>(`
     *[_type == "album"] | order(coalesce(order, 999), date desc) {
       "id": _id,
       name, description, location, date,
-      "coverImage": coverImage.asset->url + "?w=1400&auto=format&fit=max",
-      "photos": photos[] {
-        "image": photo.asset->url + "?w=1400&auto=format&fit=max",
-        caption
-      }
+      coverImage,
+      "photos": photos[] { image, caption }
     }
   `)
-  return albumsRaw.map(a => ({
-    ...a,
+  return raw.map(a => ({
+    id: a.id,
+    name: a.name,
+    description: a.description,
+    coverImage: a.coverImage ?? '',
+    location: a.location ?? '',
+    date: a.date ?? '',
     photos: (a.photos ?? []).filter((p): p is { image: string; caption: Album['photos'][0]['caption'] } => Boolean(p.image)),
   }))
 }
 
-type RawAlbum = Omit<Album, 'photos'> & {
-  photos: Array<{ image: string | null; caption: Album['photos'][0]['caption'] }> | null
-}
-
 // ─── Journal posts ───────────────────────────────────────────────────────────
 export async function fetchJournalPosts(): Promise<JournalPost[]> {
-  return client.fetch(`
+  const raw = await client.fetch<Array<{
+    id: string
+    title: JournalPost['title']
+    summary: JournalPost['summary']
+    coverImage: string | null
+    location: string
+    date: string
+    contentVi: string | null
+    contentEn: string | null
+    contentKo: string | null
+  }>>(`
     *[_type == "journalPost"] | order(date desc) {
       "id": _id,
       title, summary, location, date,
-      "coverImage": coverImage.asset->url + "?w=1200&auto=format&fit=max",
-      "content": {
-        "vi": contentVi,
-        "en": contentEn,
-        "ko": contentKo
-      }
+      coverImage,
+      contentVi, contentEn, contentKo
     }
   `)
+  return raw.map(p => ({
+    id: p.id,
+    title: p.title ?? { vi: '', en: '', ko: '' },
+    summary: p.summary ?? { vi: '', en: '', ko: '' },
+    coverImage: p.coverImage ?? '',
+    location: p.location ?? '',
+    date: p.date ?? '',
+    content: {
+      vi: p.contentVi ?? '',
+      en: p.contentEn ?? '',
+      ko: p.contentKo ?? '',
+    },
+  }))
 }
 
 // ─── Movies ─────────────────────────────────────────────────────────────────
 export async function fetchMovies(): Promise<Movie[]> {
-  const raw = await client.fetch<RawMovie[]>(`
+  const raw = await client.fetch<Array<{
+    id: string
+    title: string
+    year: number
+    director: string | null
+    cast: string | null
+    rating: number
+    genre: Movie['genre']
+    impression: Movie['impression']
+    trailer: string
+    banner: string | null
+    related: Array<{ image: string | null; caption: Movie['related'][0]['caption'] }> | null
+  }>>(`
     *[_type == "movie"] | order(coalesce(order, 999), year desc) {
       "id": _id,
-      title, year, rating, genre, impression, trailer,
-      "banner": banner.asset->url + "?w=1280&auto=format&fit=max",
-      "poster": banner.asset->url + "?w=600&auto=format&fit=max",
-      "related": related[] {
-        "image": image.asset->url + "?w=1280&auto=format&fit=max",
-        caption
-      }
+      title, year, director, cast, rating, genre, impression, trailer,
+      banner,
+      "related": related[] { image, caption }
     }
   `)
   return raw.map(m => ({
-    ...m,
+    id: m.id,
+    title: m.title,
+    year: m.year,
+    director: m.director ?? '',
+    cast: m.cast ?? '',
+    rating: m.rating,
+    genre: m.genre,
+    impression: m.impression,
+    trailer: m.trailer ?? '',
+    banner: m.banner ?? '',
+    poster: m.banner ?? '',
     related: (m.related ?? []).filter((r): r is { image: string; caption: Movie['related'][0]['caption'] } => Boolean(r.image)),
   }))
-}
-
-type RawMovie = Omit<Movie, 'related'> & {
-  related: Array<{ image: string | null; caption: Movie['related'][0]['caption'] }> | null
 }
 
 // ─── My Info ─────────────────────────────────────────────────────────────────
@@ -85,18 +109,11 @@ export async function fetchMyInfo() {
     portraitImage: string
     title: { vi: string; en: string; ko: string }
     text:  { vi: string; en: string; ko: string }
-  } | null>(`
-    *[_type == "myInfo"][0] {
-      "portraitImage": portraitImage.asset->url + "?w=800&auto=format&fit=max",
-      title, text
-    }
-  `)
+  } | null>(`*[_type == "myInfo"][0]{ portraitImage, title, text }`)
 }
 
 // ─── Video Intro ─────────────────────────────────────────────────────────────
 export async function fetchVideoUrl(): Promise<string | null> {
-  const doc = await client.fetch<{ url: string } | null>(
-    `*[_type == "videoIntro"][0]{ url }`
-  )
+  const doc = await client.fetch<{ url: string } | null>(`*[_type == "videoIntro"][0]{ url }`)
   return doc?.url ?? null
 }

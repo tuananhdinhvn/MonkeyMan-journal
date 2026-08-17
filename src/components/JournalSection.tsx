@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import SmartImage from './SmartImage';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -58,28 +58,9 @@ function fmtDate(d: string, locale: Locale) {
   );
 }
 
-export default function JournalSection({ posts: propPosts, locale, labels }: Props) {
+export default function JournalSection({ posts, locale, labels }: Props) {
   const [page, setPage]           = useState(0);
   const [selected, setSelected]   = useState<JournalPost | null>(null);
-  const [lsPosts, setLsPosts]     = useState<JournalPost[] | null>(null);
-
-  useEffect(() => {
-    const load = () => {
-      try {
-        const stored = localStorage.getItem('admin:journal');
-        setLsPosts(stored ? JSON.parse(stored) : null);
-      } catch {}
-    };
-    load();
-    window.addEventListener('storage', load);
-    window.addEventListener('focus', load);
-    return () => {
-      window.removeEventListener('storage', load);
-      window.removeEventListener('focus', load);
-    };
-  }, []);
-
-  const posts = lsPosts ?? propPosts;
 
   const totalPages = Math.ceil(posts.length / PAGE_SIZE);
   const visible    = posts.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);

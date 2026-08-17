@@ -107,9 +107,10 @@ export default function Navbar() {
 
       {/* ── MOBILE NAV ── */}
       <div className="md:hidden border-b border-[#e8e8e8] bg-white">
-        <div className="flex h-14 items-center justify-between px-5">
-          <Link href="/">
-            <span className="font-serif text-xl font-semibold text-ink">MonkeyMan</span>
+        <div className="flex h-[60px] items-center justify-between px-5">
+          <Link href="/" className="text-center">
+            <span className="font-serif text-[22px] font-semibold text-ink tracking-wide leading-none">MonkeyMan</span>
+            <p className="text-[8px] uppercase tracking-widest3 text-meta font-sans mt-0.5">Travel Journal</p>
           </Link>
           <button
             onClick={() => setMobileOpen(!mobileOpen)}

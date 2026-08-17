@@ -10,22 +10,44 @@ import Footer from '@/components/Footer';
 import HtmlLang from '@/components/HtmlLang';
 import FloatingLogo from '@/components/FloatingLogo';
 
-async function getSiteSettings() {
+type SiteSettings = {
+  siteName: string;
+  logoUrl: string;
+  title: { vi: string; en: string; ko: string };
+  description: { vi: string; en: string; ko: string };
+  ogImage: string;
+  keywords: string;
+  author: string;
+  twitterHandle: string;
+  faviconUrl: string;
+};
+
+const SETTINGS_FALLBACK: SiteSettings = {
+  siteName: 'MonkeyMan',
+  logoUrl: '/images/monkey-man-logo.png',
+  title: {
+    vi: 'MonkeyMan — Nhật Ký Du Lịch Cá Nhân của Tuấn Anh',
+    en: 'MonkeyMan — Personal Travel Journal from Vietnam',
+    ko: 'MonkeyMan — 베트남 여행 일지 | Tuấn Anh',
+  },
+  description: {
+    vi: 'Nhật ký du lịch cá nhân của Tuấn Anh — khám phá Việt Nam qua từng chuyến đi.',
+    en: 'Personal travel journal by Tuấn Anh — exploring Vietnam through every journey.',
+    ko: '뚜언 아인의 개인 여행 일지 — 모든 여행을 통해 베트남을 탐험합니다.',
+  },
+  ogImage: '/images/monkey-man-logo.png',
+  keywords: 'travel, vietnam, du lịch, MonkeyMan',
+  author: 'Monkey Man',
+  twitterHandle: '@MonkeyMan',
+  faviconUrl: '/favicon.ico',
+};
+
+async function getSiteSettings(): Promise<SiteSettings> {
   try {
     const raw = await readFile(path.join(process.cwd(), 'public', 'site-settings.json'), 'utf-8');
-    return JSON.parse(raw) as {
-      siteName: string;
-      logoUrl: string;
-      title: { vi: string; en: string; ko: string };
-      description: { vi: string; en: string; ko: string };
-      ogImage: string;
-      keywords: string;
-      author: string;
-      twitterHandle: string;
-      faviconUrl: string;
-    };
+    return { ...SETTINGS_FALLBACK, ...JSON.parse(raw) };
   } catch {
-    return null;
+    return SETTINGS_FALLBACK;
   }
 }
 
@@ -37,7 +59,6 @@ export async function generateMetadata({
   const { locale } = await params;
   const l = locale as 'vi' | 'en' | 'ko';
   const s = await getSiteSettings();
-  if (!s) return {};
 
   const isIco = s.faviconUrl?.endsWith('.ico');
   const icons: Metadata['icons'] = s.faviconUrl
@@ -59,18 +80,16 @@ export async function generateMetadata({
       type: 'website',
       url: 'https://monkeyman.vn',
       siteName: s.siteName,
-      locale: l === 'vi' ? 'vi_VN' : l === 'ko' ? 'ko_KR' : 'en_US',
-      title: s.title?.[l],
-      description: s.description?.[l],
-      ...(s.ogImage ? { images: [{ url: s.ogImage, width: 1200, height: 630 }] } : {}),
+      locale: 'en_US',
+      title: s.title?.en || s.siteName,
+      description: s.description?.en,
     },
     twitter: {
       card: 'summary_large_image',
       site: s.twitterHandle || undefined,
       creator: s.twitterHandle || undefined,
-      title: s.title?.[l],
-      description: s.description?.[l],
-      ...(s.ogImage ? { images: [s.ogImage] } : {}),
+      title: s.title?.en || s.siteName,
+      description: s.description?.en,
     },
     ...(icons ? { icons } : {}),
   };

@@ -19,9 +19,12 @@ interface Props {
 
 const LABEL = {
   related:   { vi: 'Hình ảnh liên quan', en: 'Related Images',    ko: '관련 이미지' },
-  backVideo: { vi: 'Quay lại video',     en: 'Back to video',     ko: '비디오로 돌아가기' },
+  backVideo: { vi: 'Quay lại intro',     en: 'Back to intro',     ko: '소개로 돌아가기' },
   allMovies: { vi: 'Tất cả bộ phim',     en: 'All Movies',        ko: '전체 영화' },
   backList:  { vi: 'Quay lại danh sách', en: 'Back to list',      ko: '목록으로 돌아가기' },
+  director:  { vi: 'Đạo diễn',           en: 'Director',          ko: '감독' },
+  cast:      { vi: 'Diễn viên',          en: 'Cast',              ko: '출연' },
+  genre:     { vi: 'Thể loại',           en: 'Genre',             ko: '장르' },
 };
 
 const PAGE_SIZE = 4;
@@ -33,31 +36,12 @@ function buildTrailerUrl(url: string) {
   return `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&modestbranding=1`;
 }
 
-export default function MovieSection({ movies: propMovies, locale, sectionLabel, sectionTitle, subtitle, seeAll }: Props) {
+export default function MovieSection({ movies, locale, sectionLabel, sectionTitle, subtitle, seeAll }: Props) {
   const [page, setPage]         = useState(0);
   const [showAll, setShowAll]   = useState(false);
   const [selected, setSelected] = useState<Movie | null>(null);
   const [fromList, setFromList] = useState(false);
   const [selImage, setSelImage] = useState<{ src: string; caption: string } | null>(null);
-  const [lsMovies, setLsMovies] = useState<Movie[] | null>(null);
-
-  useEffect(() => {
-    const load = () => {
-      try {
-        const stored = localStorage.getItem('admin:movies');
-        setLsMovies(stored ? JSON.parse(stored) : null);
-      } catch {}
-    };
-    load();
-    window.addEventListener('storage', load);
-    window.addEventListener('focus', load);
-    return () => {
-      window.removeEventListener('storage', load);
-      window.removeEventListener('focus', load);
-    };
-  }, []);
-
-  const movies = lsMovies ?? propMovies;
 
   const totalPages = Math.ceil(movies.length / PAGE_SIZE);
   const visible    = movies.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
@@ -127,9 +111,9 @@ export default function MovieSection({ movies: propMovies, locale, sectionLabel,
                   src={movie.banner}
                   alt={movie.title}
                   fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-700"
+                  className="object-cover brightness-105 group-hover:scale-105 transition-transform duration-700"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <span className="absolute bottom-2 right-2 bg-sage text-white text-[10px] px-2 py-0.5 font-sans font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
                   ★ {movie.rating}/10
                 </span>
@@ -137,7 +121,12 @@ export default function MovieSection({ movies: propMovies, locale, sectionLabel,
               <h4 className="wl-title text-[15px] font-bold leading-snug group-hover:text-sage transition-colors">
                 {movie.title}
               </h4>
-              <p className="wl-meta text-[12px] mt-1">{movie.year}</p>
+              <p className="wl-meta text-[12px] mt-1">
+                {movie.year}{movie.director ? ` · ${movie.director}` : ''}
+              </p>
+              {movie.genre?.[locale] && (
+                <p className="wl-meta text-[11px] mt-0.5 opacity-70">{movie.genre[locale]}</p>
+              )}
             </button>
           ))}
         </motion.div>
@@ -214,9 +203,9 @@ export default function MovieSection({ movies: propMovies, locale, sectionLabel,
                           src={movie.banner}
                           alt={movie.title}
                           fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                          className="object-cover brightness-105 group-hover:scale-105 transition-transform duration-500"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                         <span className="absolute bottom-2 right-2 bg-sage text-white text-[10px] px-2 py-0.5 font-sans font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
                           ★ {movie.rating}/10
                         </span>
@@ -224,7 +213,12 @@ export default function MovieSection({ movies: propMovies, locale, sectionLabel,
                       <h4 className="wl-title text-[14px] font-bold leading-snug group-hover:text-sage transition-colors">
                         {movie.title}
                       </h4>
-                      <p className="wl-meta text-[11px] mt-0.5">{movie.year}</p>
+                      <p className="wl-meta text-[11px] mt-0.5">
+                        {movie.year}{movie.director ? ` · ${movie.director}` : ''}
+                      </p>
+                      {movie.genre?.[locale] && (
+                        <p className="wl-meta text-[10px] mt-0.5 opacity-70">{movie.genre[locale]}</p>
+                      )}
                     </button>
                   ))}
                 </div>
@@ -256,29 +250,23 @@ export default function MovieSection({ movies: propMovies, locale, sectionLabel,
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="border-b border-[#e8e8e8]">
-                {/* Row 1: back button + close */}
-                <div className="flex items-center justify-between px-5 pt-4 pb-2">
-                  {fromList ? (
-                    <button
-                      onClick={closeDetail}
-                      className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest font-semibold font-sans text-meta hover:text-sage transition-colors"
-                    >
-                      <ArrowLeft size={12} />
-                      {LABEL.backList[locale]}
-                    </button>
-                  ) : <span />}
-                  <button onClick={closeDetail} className="text-meta hover:text-ink transition-colors p-2 rounded-full hover:bg-gray-100">
-                    <X size={20} />
+              <div className="relative border-b border-[#e8e8e8] px-16 py-5 text-center">
+                {fromList && (
+                  <button
+                    onClick={closeDetail}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-[10px] uppercase tracking-widest font-semibold font-sans text-meta hover:text-sage transition-colors"
+                  >
+                    <ArrowLeft size={12} />
+                    {LABEL.backList[locale]}
                   </button>
-                </div>
-                {/* Row 2: title + year */}
-                <div className="text-center px-5 pb-4">
-                  <h3 className="wl-title text-xl font-bold leading-snug">
-                    {selected.title}
-                    <span className="text-meta font-sans text-sm font-normal ml-2">({selected.year})</span>
-                  </h3>
-                </div>
+                )}
+                <h3 className="wl-title text-[23px] font-bold leading-snug">
+                  {selected.title}
+                  <span className="text-meta font-sans text-[13px] font-normal ml-2">({selected.year})</span>
+                </h3>
+                <button onClick={closeDetail} className="absolute right-4 top-1/2 -translate-y-1/2 text-meta hover:text-ink transition-colors p-2 rounded-full hover:bg-gray-100">
+                  <X size={20} />
+                </button>
               </div>
 
               {/* Body */}
@@ -328,6 +316,28 @@ export default function MovieSection({ movies: propMovies, locale, sectionLabel,
                             ))}
                             <span className="text-meta text-xs ml-2 font-sans">{selected.rating}/10</span>
                           </div>
+                          {(selected.director || selected.cast || selected.genre?.[locale]) && (
+                            <div className="space-y-1.5 mb-4 pb-4 border-b border-[#e8e8e8]">
+                              {selected.director && (
+                                <p className="text-xs font-sans text-meta">
+                                  <span className="font-semibold text-ink/70 uppercase tracking-wider text-[10px] mr-2">{LABEL.director[locale]}</span>
+                                  {selected.director}
+                                </p>
+                              )}
+                              {selected.cast && (
+                                <p className="text-xs font-sans text-meta">
+                                  <span className="font-semibold text-ink/70 uppercase tracking-wider text-[10px] mr-2">{LABEL.cast[locale]}</span>
+                                  {selected.cast}
+                                </p>
+                              )}
+                              {selected.genre?.[locale] && (
+                                <p className="text-xs font-sans text-meta">
+                                  <span className="font-semibold text-ink/70 uppercase tracking-wider text-[10px] mr-2">{LABEL.genre[locale]}</span>
+                                  {selected.genre[locale]}
+                                </p>
+                              )}
+                            </div>
+                          )}
                           <p className="font-serif text-ink text-[15px] leading-relaxed">{selected.impression[locale]}</p>
                         </motion.div>
                       )}
@@ -344,7 +354,7 @@ export default function MovieSection({ movies: propMovies, locale, sectionLabel,
                             key={i}
                             onClick={() => setSelImage({ src: rel.image, caption: rel.caption[locale] })}
                             className={`relative aspect-video overflow-hidden transition-all duration-200 ${
-                              selImage?.src === rel.image ? 'ring-2 ring-sage opacity-100' : 'opacity-60 hover:opacity-100'
+                              selImage?.src === rel.image ? 'ring-2 ring-sage opacity-100' : 'opacity-85 hover:opacity-100'
                             }`}
                           >
                             <SmartImage src={rel.image} alt="" fill className="object-cover" sizes="15vw" />

@@ -3,16 +3,16 @@
   "logoUrl": "/uploads/1786587363344-bvqzo.png",
   "faviconUrl": "/favicon.ico",
   "title": {
-    "vi": "MonkeyMan — Nhật Ký Du Lịch",
-    "en": "Monkey Man -  my travel journal",
-    "ko": "Monkey Man — 여행 일지"
+    "vi": "MonkeyMan — Nhật Ký Du Lịch Cá Nhân của Tuấn Anh",
+    "en": "MonkeyMan — Personal Travel Journal from Vietnam",
+    "ko": "MonkeyMan — 베트남 여행 일지 | Tuấn Anh"
   },
   "description": {
     "vi": "Nhật ký du lịch cá nhân của Tuấn Anh — khám phá Việt Nam qua từng chuyến đi.",
     "en": "Personal travel journal by Tuấn Anh — exploring Vietnam through every journey.",
     "ko": "뚜언 아인의 개인 여행 일지 — 모든 여행을 통해 베트남을 탐험합니다."
   },
-  "ogImage": "",
+  "ogImage": "/uploads/1786587363344-bvqzo.png",
   "keywords": "travel, vietnam, du lịch, MonkeyMan",
   "author": "Monkey Man",
   "twitterHandle": "@MonkeyMan",
