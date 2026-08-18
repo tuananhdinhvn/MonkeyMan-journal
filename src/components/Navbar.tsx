@@ -22,12 +22,12 @@ export default function Navbar() {
   const visible = !isHome || scrolled;
 
   const NAV_LINKS = [
-    { id: 'home',       label: 'Home',       offset: 0  },
-    { id: 'my-info',    label: 'My Info',    offset: 20 },
-    { id: 'my-album',   label: 'My Album',   offset: 20 },
-    { id: 'my-journal', label: 'My Journal', offset: 0  },
-    { id: 'my-movies',  label: 'My Movies',  offset: 0  },
-    { id: 'call-me',    label: 'Call Me',    offset: 0  },
+    { id: 'home',       label: 'Home',       offset: 0   },
+    { id: 'my-info',    label: 'My Info',    offset: -80 },
+    { id: 'my-album',   label: 'My Album',   offset: -80 },
+    { id: 'my-journal', label: 'My Journal', offset: -80 },
+    { id: 'my-movies',  label: 'My Movies',  offset: -80 },
+    { id: 'call-me',    label: 'Call Me',    offset: -80 },
   ];
 
   const scrollTo = (e: React.MouseEvent<HTMLAnchorElement>, id: string, offset = 0) => {
