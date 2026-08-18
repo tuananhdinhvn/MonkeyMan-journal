@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 import { Roboto } from 'next/font/google';
-import { readFile } from 'fs/promises';
-import path from 'path';
 import Script from 'next/script';
 import './globals.css';
 
@@ -32,17 +30,8 @@ export const metadata: Metadata = {
   },
 };
 
-async function getGaId(): Promise<string> {
-  try {
-    const raw = await readFile(path.join(process.cwd(), 'public', 'site-settings.json'), 'utf-8');
-    return (JSON.parse(raw) as { gaId?: string }).gaId ?? '';
-  } catch {
-    return '';
-  }
-}
-
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const gaId = await getGaId();
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const gaId = process.env.NEXT_PUBLIC_GA_ID || '';
 
   return (
     <html className={roboto.variable} suppressHydrationWarning>
