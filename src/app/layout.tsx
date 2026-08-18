@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { Roboto } from 'next/font/google';
-import Script from 'next/script';
 import './globals.css';
 
 const roboto = Roboto({
@@ -33,18 +32,17 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html className={roboto.variable} suppressHydrationWarning>
-      <body className="bg-white text-ink font-sans antialiased" suppressHydrationWarning>
-        {children}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-8CHCD01JT1"
-          strategy="afterInteractive"
-        />
-        <Script id="ga-init" strategy="afterInteractive">{`
+      <head>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-8CHCD01JT1" />
+        <script dangerouslySetInnerHTML={{ __html: `
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
           gtag('config', 'G-8CHCD01JT1');
-        `}</Script>
+        `}} />
+      </head>
+      <body className="bg-white text-ink font-sans antialiased" suppressHydrationWarning>
+        {children}
       </body>
     </html>
   );
