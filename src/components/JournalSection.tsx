@@ -10,26 +10,30 @@ import type { JournalPost, JournalContent } from '@/lib/data';
 
 type Locale = 'vi' | 'en' | 'ko';
 
-const contentStyle = {
-  fontFamily: 'var(--font-serif, Georgia, serif)',
-  color: 'var(--color-ink, #1a1a1a)',
-  fontSize: '16px',
-  lineHeight: '1.75',
-  marginBottom: '2rem',
-};
-
 function ContentRenderer({ content }: { content: JournalContent }) {
   if (Array.isArray(content)) {
     return (
-      <div className="prose max-w-none" style={contentStyle}>
+      <div className="prose max-w-none text-[15px] leading-relaxed text-ink/90">
         <PortableText value={content} />
       </div>
     );
   }
   return (
     <div
-      className="prose max-w-none"
-      style={contentStyle}
+      className="
+        text-[15px] leading-relaxed text-ink/90
+        [&_p]:mb-5
+        [&_h2]:font-serif [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:mt-8 [&_h2]:mb-3 [&_h2]:text-ink
+        [&_h3]:font-serif [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mt-6 [&_h3]:mb-2 [&_h3]:text-ink
+        [&_ul]:list-disc [&_ul]:ml-5 [&_ul]:mb-4
+        [&_ol]:list-decimal [&_ol]:ml-5 [&_ol]:mb-4
+        [&_li]:mb-1
+        [&_strong]:font-semibold [&_strong]:text-ink
+        [&_em]:italic
+        [&_hr]:border-[#e8e8e8] [&_hr]:my-6
+        [&_img]:rounded-lg [&_img]:my-5 [&_img]:max-w-full
+        [&_blockquote]:border-l-4 [&_blockquote]:border-sage/40 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-meta [&_blockquote]:my-5
+      "
       dangerouslySetInnerHTML={{ __html: content }}
     />
   );
@@ -59,8 +63,8 @@ function fmtDate(d: string, locale: Locale) {
 }
 
 export default function JournalSection({ posts, locale, labels }: Props) {
-  const [page, setPage]           = useState(0);
-  const [selected, setSelected]   = useState<JournalPost | null>(null);
+  const [page, setPage]         = useState(0);
+  const [selected, setSelected] = useState<JournalPost | null>(null);
 
   const totalPages = Math.ceil(posts.length / PAGE_SIZE);
   const visible    = posts.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
@@ -166,42 +170,50 @@ export default function JournalSection({ posts, locale, labels }: Props) {
               animate={{ opacity: 1, y: 0,  scale: 1 }}
               exit={{ opacity: 0,    y: 18, scale: 0.97 }}
               transition={{ duration: 0.28 }}
-              className="relative w-full max-w-5xl bg-white shadow-2xl overflow-hidden rounded-[10px]"
+              className="relative w-full max-w-2xl bg-white shadow-2xl overflow-hidden rounded-2xl max-h-[90vh] flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close */}
               <button
                 onClick={close}
-                className="absolute top-4 right-4 z-10 text-meta hover:text-ink transition-colors p-2 rounded-full hover:bg-gray-100"
+                className="absolute top-4 right-4 z-20 bg-black/30 hover:bg-black/50 text-white transition-colors p-1.5 rounded-full backdrop-blur-sm"
               >
-                <X size={20} />
+                <X size={16} />
               </button>
 
-              <div className="flex flex-col md:flex-row max-h-[88vh]">
-                {/* Left: cover image */}
-                <div className="md:w-[42%] shrink-0 relative min-h-[240px] md:min-h-0">
+              {/* Hero banner */}
+              {selected.coverImage && (
+                <div className="relative h-[220px] sm:h-[270px] shrink-0">
                   <SmartImage
                     src={selected.coverImage}
                     alt={selected.title[locale]}
                     fill
                     className="object-cover"
                   />
-                </div>
-
-                {/* Right: scrollable content */}
-                <div className="md:w-[58%] overflow-y-auto">
-                  <div className="p-8">
-                    <p className="text-xs text-gray-400 mb-3 font-sans uppercase tracking-wider">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-6">
+                    <p className="text-white/70 text-[11px] font-sans uppercase tracking-widest mb-1.5">
                       {fmtDate(selected.date, locale)} · {selected.location}
                     </p>
-                    <h2 className="wl-title text-2xl sm:text-3xl mb-5 leading-snug">
+                    <h2 className="text-white font-serif text-xl sm:text-2xl font-semibold leading-snug">
                       {selected.title[locale]}
                     </h2>
-                    <p className="text-meta text-[15px] leading-relaxed mb-6 pb-6 border-b border-[#e8e8e8]">
+                  </div>
+                </div>
+              )}
+
+              {/* Scrollable content */}
+              <div className="overflow-y-auto flex-1">
+                <div className="px-7 py-6">
+                  {/* Summary */}
+                  {selected.summary[locale] && (
+                    <p className="text-meta text-[15px] leading-relaxed mb-6 pb-6 border-b border-[#e8e8e8] italic">
                       {selected.summary[locale]}
                     </p>
-                    <ContentRenderer content={selected.content[locale]} />
-                  </div>
+                  )}
+
+                  {/* Body */}
+                  <ContentRenderer content={selected.content[locale]} />
                 </div>
               </div>
             </motion.div>
