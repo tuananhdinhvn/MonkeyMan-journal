@@ -183,7 +183,7 @@ export default function JournalSection({ posts, locale, labels }: Props) {
 
               {/* Hero banner */}
               {selected.coverImage && (
-                <div className="relative h-[220px] sm:h-[270px] shrink-0">
+                <div className="relative h-[175px] sm:h-[215px] shrink-0">
                   <SmartImage
                     src={selected.coverImage}
                     alt={selected.title[locale]}
