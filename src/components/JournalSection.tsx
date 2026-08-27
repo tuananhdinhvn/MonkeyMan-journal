@@ -23,8 +23,8 @@ function ContentRenderer({ content }: { content: JournalContent }) {
       className="
         text-[15px] leading-relaxed text-ink/90
         [&_p]:mb-5
-        [&_h2]:font-serif [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:mt-8 [&_h2]:mb-3 [&_h2]:text-ink
-        [&_h3]:font-serif [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mt-6 [&_h3]:mb-2 [&_h3]:text-ink
+        [&_h2]:font-sans [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:mt-8 [&_h2]:mb-3 [&_h2]:text-ink
+        [&_h3]:font-sans [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mt-6 [&_h3]:mb-2 [&_h3]:text-ink
         [&_ul]:list-disc [&_ul]:ml-5 [&_ul]:mb-4
         [&_ol]:list-decimal [&_ol]:ml-5 [&_ol]:mb-4
         [&_li]:mb-1
@@ -195,7 +195,7 @@ export default function JournalSection({ posts, locale, labels }: Props) {
                     <p className="text-white/70 text-[11px] font-sans uppercase tracking-widest mb-1.5">
                       {fmtDate(selected.date, locale)} · {selected.location}
                     </p>
-                    <h2 className="text-white font-serif text-xl sm:text-2xl font-semibold leading-snug">
+                    <h2 className="text-white font-sans text-xl sm:text-2xl font-semibold leading-snug">
                       {selected.title[locale]}
                     </h2>
                   </div>

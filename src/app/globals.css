@@ -22,7 +22,7 @@ body {
 }
 
 .wl-title {
-  @apply font-serif font-bold text-ink leading-tight;
+  @apply font-sans font-bold text-ink leading-tight;
 }
 
 .wl-link {

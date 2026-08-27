@@ -76,7 +76,7 @@ export default function HeroSlider({ slides, locale, readMore, byLabel }: Props)
               <div className="w-8 h-px bg-white/50 mb-5" />
 
               {/* Title */}
-              <h1 className="font-serif text-white font-semibold leading-tight mb-5"
+              <h1 className="font-sans text-white font-semibold leading-tight mb-5"
                 style={{ fontSize: 'clamp(32px, 5vw, 58px)' }}>
                 {slide.title[locale]}
               </h1>

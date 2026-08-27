@@ -190,7 +190,7 @@ export default function DestinationSlider({ albums, locale }: Props) {
             </p>
 
             {/* Title */}
-            <p className="absolute top-14 left-1/2 -translate-x-1/2 text-white/70 text-base font-serif font-bold whitespace-nowrap">
+            <p className="absolute top-14 left-1/2 -translate-x-1/2 text-white/70 text-base font-sans font-bold whitespace-nowrap">
               {album.name[locale]}
             </p>
 
@@ -241,7 +241,7 @@ export default function DestinationSlider({ albums, locale }: Props) {
               onClick={(e) => e.stopPropagation()}
             >
               {currentCaption && (
-                <p className="text-white/70 text-sm font-serif text-center px-10">
+                <p className="text-white/70 text-sm font-sans text-center px-10">
                   {currentCaption}
                 </p>
               )}

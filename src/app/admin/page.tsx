@@ -157,7 +157,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 function SectionTitle({ title, desc }: { title: string; desc?: string }) {
   return (
     <div className="mb-8 pb-6 border-b border-gray-100">
-      <h2 className="text-2xl font-serif font-semibold text-gray-800 mb-1">{title}</h2>
+      <h2 className="text-2xl font-sans font-semibold text-gray-800 mb-1">{title}</h2>
       {desc && <p className="text-sm text-gray-500">{desc}</p>}
     </div>
   );
@@ -347,7 +347,7 @@ function AlbumForm({ album, isNew, onChange, onSave, onCancel, saving }: {
         <button onClick={onCancel} className="text-sm text-gray-400 hover:text-gray-600 transition-colors">
           ← Quay lại
         </button>
-        <h2 className="text-xl font-serif font-semibold text-gray-800">
+        <h2 className="text-xl font-sans font-semibold text-gray-800">
           {isNew ? 'Thêm album mới' : 'Sửa album'}
         </h2>
       </div>
@@ -465,7 +465,7 @@ function AlbumsSection({ onSaved }: { onSaved: () => void }) {
     <div>
       <div className="flex items-start justify-between mb-8 pb-6 border-b border-gray-100">
         <div>
-          <h2 className="text-2xl font-serif font-semibold text-gray-800 mb-1">My Album</h2>
+          <h2 className="text-2xl font-sans font-semibold text-gray-800 mb-1">My Album</h2>
           <p className="text-sm text-gray-500">Quản lý album ảnh của chuyến đi</p>
         </div>
         <Btn onClick={startNew}>+ Thêm album</Btn>
@@ -546,7 +546,7 @@ function JournalPostForm({ post, isNew, onChange, onSave, onCancel, saving }: {
         <button onClick={onCancel} className="text-sm text-gray-400 hover:text-gray-600 transition-colors">
           ← Quay lại
         </button>
-        <h2 className="text-xl font-serif font-semibold text-gray-800">
+        <h2 className="text-xl font-sans font-semibold text-gray-800">
           {isNew ? 'Thêm bài nhật ký mới' : 'Sửa bài nhật ký'}
         </h2>
       </div>
@@ -659,7 +659,7 @@ function JournalAdminSection({ onSaved }: { onSaved: () => void }) {
     <div>
       <div className="flex items-start justify-between mb-8 pb-6 border-b border-gray-100">
         <div>
-          <h2 className="text-2xl font-serif font-semibold text-gray-800 mb-1">My Journal</h2>
+          <h2 className="text-2xl font-sans font-semibold text-gray-800 mb-1">My Journal</h2>
           <p className="text-sm text-gray-500">Quản lý bài nhật ký du lịch</p>
         </div>
         <Btn onClick={startNew}>+ Thêm bài viết</Btn>
@@ -799,7 +799,7 @@ function TripForm({ trip, isNew, onChange, onSave, onCancel }: {
         <button onClick={onCancel} className="text-sm text-gray-400 hover:text-gray-600 transition-colors">
           ← Quay lại
         </button>
-        <h2 className="text-xl font-serif font-semibold text-gray-800">
+        <h2 className="text-xl font-sans font-semibold text-gray-800">
           {isNew ? 'Thêm chuyến đi mới' : 'Sửa chuyến đi'}
         </h2>
       </div>
@@ -881,7 +881,7 @@ function TripsSection({ onSaved }: { onSaved: () => void }) {
     <div>
       <div className="flex items-start justify-between mb-8 pb-6 border-b border-gray-100">
         <div>
-          <h2 className="text-2xl font-serif font-semibold text-gray-800 mb-1">Albums / Journal</h2>
+          <h2 className="text-2xl font-sans font-semibold text-gray-800 mb-1">Albums / Journal</h2>
           <p className="text-sm text-gray-500">Quản lý chuyến đi, album ảnh và bài nhật ký</p>
         </div>
         <Btn onClick={startNew}>+ Thêm mới</Btn>
@@ -1013,7 +1013,7 @@ function MovieForm({ movie, isNew, onChange, onSave, onCancel, saving }: {
         <button onClick={onCancel} className="text-sm text-gray-400 hover:text-gray-600 transition-colors">
           ← Quay lại
         </button>
-        <h2 className="text-xl font-serif font-semibold text-gray-800">
+        <h2 className="text-xl font-sans font-semibold text-gray-800">
           {isNew ? 'Thêm phim mới' : 'Sửa thông tin phim'}
         </h2>
       </div>
@@ -1030,7 +1030,7 @@ function MovieForm({ movie, isNew, onChange, onSave, onCancel, saving }: {
             <div className="flex items-center gap-3">
               <Inp type="range" min={1} max={10} value={movie.rating} className="flex-1 h-9 cursor-pointer border-0 px-0 focus:ring-0"
                 onChange={e => set('rating', parseInt(e.target.value))} />
-              <span className="text-lg font-serif font-semibold text-gray-700 w-8 text-center">{movie.rating}</span>
+              <span className="text-lg font-sans font-semibold text-gray-700 w-8 text-center">{movie.rating}</span>
             </div>
           </Field>
         </div>
@@ -1155,7 +1155,7 @@ function MoviesSection({ onSaved }: { onSaved: () => void }) {
     <div>
       <div className="flex items-start justify-between mb-8 pb-6 border-b border-gray-100">
         <div>
-          <h2 className="text-2xl font-serif font-semibold text-gray-800 mb-1">Movies</h2>
+          <h2 className="text-2xl font-sans font-semibold text-gray-800 mb-1">Movies</h2>
           <p className="text-sm text-gray-500">Quản lý danh sách phim yêu thích</p>
         </div>
         <Btn onClick={startNew}>+ Thêm phim</Btn>
@@ -1467,7 +1467,7 @@ export default function AdminPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 w-full max-w-sm">
           <div className="text-center mb-6">
-            <h1 className="font-serif text-2xl font-semibold text-gray-800">MonkeyMan</h1>
+            <h1 className="font-sans text-2xl font-semibold text-gray-800">MonkeyMan</h1>
             <p className="text-sm text-gray-400 mt-1">Admin Panel</p>
           </div>
           <div className="space-y-3">
@@ -1510,7 +1510,7 @@ export default function AdminPage() {
             <span className="group-hover:-translate-x-0.5 transition-transform">←</span>
             Về trang blog
           </a>
-          <p className="font-serif text-lg font-semibold text-gray-800 leading-none">MonkeyMan</p>
+          <p className="font-sans text-lg font-semibold text-gray-800 leading-none">MonkeyMan</p>
           <p className="text-[10px] uppercase tracking-widest text-gray-400 font-sans mt-1">Admin Panel</p>
         </div>
 

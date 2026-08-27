@@ -80,7 +80,7 @@ export default function Navbar() {
               onClick={(e) => scrollTo(e, 'home')}
               className="px-8 shrink-0 text-center"
             >
-              <span className="font-serif text-[28px] font-semibold text-ink tracking-wide leading-none">
+              <span className="font-sans text-[28px] font-semibold text-ink tracking-wide leading-none">
                 MonkeyMan
               </span>
               <p className="text-[9px] uppercase tracking-widest3 text-meta font-sans mt-0.5">
@@ -109,7 +109,7 @@ export default function Navbar() {
       <div className="md:hidden border-b border-[#e8e8e8] bg-white">
         <div className="flex h-[60px] items-center justify-between px-5">
           <Link href="/" className="text-center">
-            <span className="font-serif text-[22px] font-semibold text-ink tracking-wide leading-none">MonkeyMan</span>
+            <span className="font-sans text-[22px] font-semibold text-ink tracking-wide leading-none">MonkeyMan</span>
             <p className="text-[8px] uppercase tracking-widest3 text-meta font-sans mt-0.5">Travel Journal</p>
           </Link>
           <button

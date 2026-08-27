@@ -302,7 +302,7 @@ export default function MovieSection({ movies, locale, sectionLabel, sectionTitl
                             <ArrowLeft size={12} />
                             {LABEL.backVideo[locale]}
                           </button>
-                          <p className="font-serif text-ink text-[15px] leading-relaxed">{selImage.caption}</p>
+                          <p className="font-sans text-ink text-[15px] leading-relaxed">{selImage.caption}</p>
                         </motion.div>
                       ) : (
                         <motion.div key="review" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.22 }}>
@@ -336,7 +336,7 @@ export default function MovieSection({ movies, locale, sectionLabel, sectionTitl
                               </tbody>
                             </table>
                           )}
-                          <p className="font-serif text-ink text-[15px] leading-relaxed">{selected.impression[locale]}</p>
+                          <p className="font-sans text-ink text-[15px] leading-relaxed">{selected.impression[locale]}</p>
                         </motion.div>
                       )}
                     </AnimatePresence>
