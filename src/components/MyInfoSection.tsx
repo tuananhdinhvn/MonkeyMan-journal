@@ -43,6 +43,11 @@ export default function MyInfoSection({ locale, initial }: { locale: Locale; ini
     };
   }, [initial]);
 
+  const paragraphs = info.text[locale]
+    .split(/\n\n|\n/)
+    .map(s => s.trim())
+    .filter(Boolean);
+
   return (
     <div className="flex flex-col md:flex-row items-center gap-0">
       <div className="md:w-[35%] flex justify-center">
@@ -50,9 +55,21 @@ export default function MyInfoSection({ locale, initial }: { locale: Locale; ini
           <SmartImage src={info.portraitImage} alt="MonkeyMan" fill className="object-cover" />
         </div>
       </div>
-      <div className="md:w-[65%] px-8 md:px-10 lg:px-12 py-16 md:py-0">
-        <h2 className="wl-title text-3xl sm:text-4xl mb-5">{info.title[locale]}</h2>
-        <p className="text-meta text-[15px] leading-relaxed mb-8">{info.text[locale]}</p>
+      <div className="md:w-[65%] px-8 md:px-10 lg:px-16 py-16 md:py-0">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-ink/40 font-sans mb-5">
+          MonkeyMan
+        </p>
+        <h2 className="font-sans text-[22px] sm:text-[26px] font-normal text-ink leading-snug tracking-wide mb-6">
+          {info.title[locale]}
+        </h2>
+        <div className="w-8 h-px bg-ink/20 mb-6" />
+        <div className="space-y-4">
+          {paragraphs.map((p, i) => (
+            <p key={i} className="font-sans text-[15px] text-ink/65 leading-[1.85]">
+              {p}
+            </p>
+          ))}
+        </div>
       </div>
     </div>
   );
