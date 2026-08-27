@@ -43,7 +43,7 @@ export default function MyInfoSection({ locale, initial }: { locale: Locale; ini
     };
   }, [initial]);
 
-  const paragraphs = info.text[locale]
+  const paragraphs = info.title[locale]
     .split(/\n\n|\n/)
     .map(s => s.trim())
     .filter(Boolean);
@@ -56,12 +56,9 @@ export default function MyInfoSection({ locale, initial }: { locale: Locale; ini
         </div>
       </div>
       <div className="md:w-[65%] px-8 md:px-10 lg:px-16 py-16 md:py-0">
-        <p className="text-[10px] uppercase tracking-[0.2em] text-ink/40 font-sans mb-5">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-ink/40 font-sans mb-6">
           MonkeyMan
         </p>
-        <h2 className="font-sans text-[22px] sm:text-[26px] font-normal text-ink leading-snug tracking-wide mb-6">
-          {info.title[locale]}
-        </h2>
         <div className="w-8 h-px bg-ink/20 mb-6" />
         <div className="space-y-4">
           {paragraphs.map((p, i) => (
