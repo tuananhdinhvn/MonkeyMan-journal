@@ -56,13 +56,22 @@ export default function MyInfoSection({ locale, initial }: { locale: Locale; ini
         </div>
       </div>
       <div className="md:w-[65%] px-8 md:px-10 lg:px-16 py-16 md:py-0">
-        <p className="text-[10px] uppercase tracking-[0.2em] text-ink/40 font-sans mb-6">
+        {/* Brand name */}
+        <p className="font-sans text-[13px] font-semibold uppercase tracking-[0.35em] text-ink mb-4">
           MonkeyMan
         </p>
-        <div className="w-8 h-px bg-ink/20 mb-6" />
-        <div className="space-y-4">
+
+        {/* Decorative divider */}
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-10 h-px bg-ink/30" />
+          <span className="text-ink/25 text-[10px] tracking-[0.4em] uppercase font-sans">Travel Journal</span>
+          <div className="flex-1 h-px bg-ink/10" />
+        </div>
+
+        {/* Body paragraphs */}
+        <div className="space-y-5">
           {paragraphs.map((p, i) => (
-            <p key={i} className="font-sans text-[15px] text-ink/65 leading-[1.85]">
+            <p key={i} className="font-sans text-[15.5px] text-ink/70 leading-[1.9] tracking-[0.01em]">
               {p}
             </p>
           ))}
