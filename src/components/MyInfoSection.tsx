@@ -63,7 +63,6 @@ export default function MyInfoSection({ locale, initial }: { locale: Locale; ini
 
         {/* Decorative divider */}
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-px bg-ink/30" />
           <span className="text-ink/25 text-[10px] tracking-[0.4em] uppercase font-sans">Travel Journal</span>
           <div className="flex-1 h-px bg-ink/10" />
         </div>
